@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import {
   PANELS_CATALOG,
-  BATTERIES_CATALOG,
   INVERTERS_CATALOG,
+  BATTERIES_CATALOG,
 } from "../data/ApplianceData";
 
 export function useLoadCalculations(rows, systemType = "hybrid") {
+  // 🔹 1. Total load
   const totalWatts = useMemo(
     () =>
       rows.reduce(
@@ -15,17 +16,17 @@ export function useLoadCalculations(rows, systemType = "hybrid") {
     [rows]
   );
 
-  const inverterCatalog = INVERTERS_CATALOG[systemType];
-  const panelCatalog = PANELS_CATALOG[systemType];
-  const batteryCatalog = BATTERIES_CATALOG[systemType];
-
-  // 🧮 Inverter size
+  // 🔹 2. Filter catalogs
+  const panelCatalog = PANELS_CATALOG[systemType] || [];
+  const inverterCatalog = INVERTERS_CATALOG[systemType] || [];
+  const batteryCatalog = BATTERIES_CATALOG[systemType] || [];
+  // 🔹 3. Inverter sizing (kVA)
   const inverterKVA = useMemo(() => {
     if (totalWatts <= 0) return 0;
     return Math.ceil(((totalWatts * 1.3) / 1000) * 10) / 10;
   }, [totalWatts]);
 
-  // 🔋 Battery capacity
+  // 🔹 4. Battery sizing (Ah)
   const batteryAh = useMemo(() => {
     if (systemType === "onGrid" || totalWatts <= 0) return 0;
     const hours = systemType === "offGrid" ? 6 : 3;
@@ -34,41 +35,49 @@ export function useLoadCalculations(rows, systemType = "hybrid") {
     return Math.ceil(ah / 50) * 50;
   }, [totalWatts, systemType]);
 
-  // ☀️ Best Panel
+  // 🔹 5. Best Panel (actual watt)
   const bestPanel = useMemo(() => {
-    if (totalWatts <= 0 || !panelCatalog?.length) return null;
+    if (totalWatts <= 0 || !panelCatalog.length) return null;
+
     let best = null;
     for (const p of panelCatalog) {
-      const needed = Math.ceil(totalWatts / p.watt);
-      const cost = needed * p.pricePKR;
+      const actualWatt = p.actualWatt || p.watt;
+      const needed = Math.ceil(totalWatts / actualWatt);
+      const cost = needed * (p.pricePKR || 0);
       if (!best || cost < best.cost) best = { ...p, needed, cost };
     }
     return best;
   }, [totalWatts, panelCatalog]);
 
-  // ⚙️ Best Inverter
+  // 🔹 6. Best Inverter (actual output watt)
   const bestInverter = useMemo(() => {
-    if (inverterKVA <= 0 || !inverterCatalog?.length) return null;
-    return (
-      inverterCatalog.find((i) => i.kva >= inverterKVA) ||
-      inverterCatalog[inverterCatalog.length - 1]
-    );
-  }, [inverterKVA, inverterCatalog]);
+    if (totalWatts <= 0 || !inverterCatalog.length) return null;
 
-  // 🔋 Best Battery
+    // ab buffer nahi dena — direct compare actualWatt se
+    let best = inverterCatalog.find((inv) => inv.actualWatt >= totalWatts);
+    console.log("best", best);
+
+    // agar koi match nahi mila to sabse bada inverter lo
+    if (!best) best = inverterCatalog[inverterCatalog.length - 1];
+
+    return best;
+  }, [totalWatts, inverterCatalog]);
+
+  // 🔹 7. Best Battery
   const bestBattery = useMemo(() => {
-    if (batteryAh <= 0 || !batteryCatalog?.length) return null;
+    if (batteryAh <= 0 || !batteryCatalog.length) return null;
     return (
       batteryCatalog.find((b) => b.ah >= batteryAh) ||
       batteryCatalog[batteryCatalog.length - 1]
     );
   }, [batteryAh, batteryCatalog]);
 
-  // 💰 Approx Cost
+  // 🔹 8. Approx total cost
   const approxCostPKR = useMemo(() => {
     if (!bestPanel || !bestInverter) return 0;
-    let total = bestPanel.cost + bestInverter.pricePKR;
-    if (systemType !== "onGrid" && bestBattery) total += bestBattery.pricePKR;
+    let total = (bestPanel.cost || 0) + (bestInverter.pricePKR || 0);
+    if (systemType !== "onGrid" && bestBattery)
+      total += bestBattery.pricePKR || 0;
     return Math.round(total);
   }, [bestPanel, bestInverter, bestBattery, systemType]);
 
@@ -77,8 +86,8 @@ export function useLoadCalculations(rows, systemType = "hybrid") {
     inverterKVA,
     batteryAh,
     bestPanel,
-    bestBattery,
     bestInverter,
+    bestBattery,
     approxCostPKR,
   };
 }

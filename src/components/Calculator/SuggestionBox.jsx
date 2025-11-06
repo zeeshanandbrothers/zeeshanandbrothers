@@ -24,6 +24,7 @@ const SuggestionBox = ({ calc }) => {
   const batteryCatalog = BATTERIES_CATALOG[systemType] || [];
   const inverterCatalog = INVERTERS_CATALOG[systemType] || [];
   console.log("panel", panelCatalog);
+  console.log("inv", inverterCatalog);
 
   // --- States for selected items ---
   const [selectedPanelId, setSelectedPanelId] = useState(bestPanel?.id);
@@ -48,9 +49,13 @@ const SuggestionBox = ({ calc }) => {
   const selectedInverter =
     inverterCatalog.find((i) => i.id === selectedInverterId) || bestInverter;
 
-  const platesNeeded = selectedPanel?.watt
-    ? Math.ceil(totalWatts / selectedPanel.watt)
+  const platesNeeded = selectedPanel?.actualWatt
+    ? Math.ceil(totalWatts / selectedPanel.actualWatt)
     : 0;
+
+  const inverterNeeded = selectedInverter?.actualWatt
+    ? Math.ceil(totalWatts / selectedInverter.actualWatt)
+    : 1;
 
   if (!totalWatts || totalWatts <= 0)
     return (
@@ -107,7 +112,7 @@ ${
         <div className="mb-5 border p-5 rounded-md shadow-sm">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <h4 className="font-semibold">Solar Panel</h4>
-            <select
+            {/* <select
               className="border rounded px-2 py-1"
               value={selectedPanelId}
               onChange={(e) => setSelectedPanelId(e.target.value)}
@@ -117,7 +122,7 @@ ${
                   {p.brand} {p.watt}W
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <img
@@ -146,7 +151,7 @@ ${
       )}
 
       {/* 🔋 Battery Section (hide for On-Grid) */}
-      {systemType !== "onGrid" && selectedBattery && (
+      {/* {systemType !== "onGrid" && selectedBattery && (
         <div className="mb-5 border p-5 rounded-md shadow-sm">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <h4 className="font-semibold">Battery</h4>
@@ -182,7 +187,7 @@ ${
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* ⚙️ Inverter Section */}
       {selectedInverter && (
@@ -219,6 +224,11 @@ ${
                 </span>
               </p>
               <p>{selectedInverter.kva} kVA Capacity</p>
+              <p>
+                You need <strong>{inverterNeeded}</strong> inverter(s) of{" "}
+                {selectedInverter.kva} kVA ({selectedInverter.actualWatt}W
+                actual)
+              </p>
             </div>
           </div>
         </div>
