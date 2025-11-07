@@ -1,4 +1,4 @@
-// src/components/ApplianceData.js
+// src/components/ApplianceData.js 
 import { uid } from "../utils/helper";
 
 export const APPLIANCE_OPTIONS = {
