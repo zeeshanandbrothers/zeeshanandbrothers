@@ -112,45 +112,47 @@ const ApplianceTable = ({
               {/* 🔹 Expand Items */}
               {expandedCategory === category && (
                 <div className="p-4 bg-gray-50 animate-slide-down">
-                  <table className="w-full text-sm">
-                    <thead className="bg-blue-100 text-gray-700 font-semibold">
-                      <tr>
-                        <th className="text-left p-2">Appliance</th>
-                        <th className="p-2 text-center">Power (W)</th>
-                        <th className="p-2 text-center">Quantity</th>
-                        <th className="p-2 text-center">Total (W)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item) => (
-                        <tr
-                          key={item.id}
-                          className="border-b hover:bg-gray-100"
-                        >
-                          <td className="p-2">{item.label}</td>
-                          <td className="p-2 text-center">{item.watts}</td>
-                          <td className="p-2 text-center">
-                            <input
-                              type="number"
-                              min={0}
-                              className="w-16 border rounded px-2 py-1 text-center"
-                              value={item.qty}
-                              onChange={(e) =>
-                                handleQtyChange(
-                                  category,
-                                  item.id,
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </td>
-                          <td className="p-2 text-center text-gray-700">
-                            {item.total}
-                          </td>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-blue-100 text-gray-700 font-semibold">
+                        <tr>
+                          <th className="text-left p-2">Appliance</th>
+                          <th className="p-2 text-center">Power (W)</th>
+                          <th className="p-2 text-center">Quantity</th>
+                          <th className="p-2 text-center">Total (W)</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {items.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="border-b hover:bg-gray-100"
+                          >
+                            <td className="p-2">{item.label}</td>
+                            <td className="p-2 text-center">{item.watts}</td>
+                            <td className="p-2 text-center">
+                              <input
+                                type="number"
+                                min={0}
+                                className="w-16 border rounded px-2 py-1 text-center"
+                                value={item.qty}
+                                onChange={(e) =>
+                                  handleQtyChange(
+                                    category,
+                                    item.id,
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td className="p-2 text-center text-gray-700">
+                              {item.total}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
