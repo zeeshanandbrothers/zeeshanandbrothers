@@ -112,7 +112,7 @@ ${
         <div className="mb-5 border p-5 rounded-md shadow-sm">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <h4 className="font-semibold">Solar Panel</h4>
-            {/* <select
+            <select
               className="border rounded px-2 py-1"
               value={selectedPanelId}
               onChange={(e) => setSelectedPanelId(e.target.value)}
@@ -122,7 +122,7 @@ ${
                   {p.brand} {p.watt}W
                 </option>
               ))}
-            </select> */}
+            </select>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <img

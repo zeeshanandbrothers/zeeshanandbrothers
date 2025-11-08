@@ -86,27 +86,64 @@ const LoadCalculator = () => {
         type: "custom",
         optionId: null,
         name: "",
-        watts: 100,
-        qty: 1,
+        watts: 0,
+        qty: 0,
+        isDefault: false,
       },
     ]);
 
-  const updateRow = (id, field, value) =>
-    setRows((prev) =>
-      prev.map((r) =>
-        r.id === id
-          ? {
-              ...r,
-              [field]:
-                field === "name"
-                  ? value
-                  : field === "optionId"
-                  ? value
-                  : Math.max(0, Number(value) || 0),
-            }
-          : r
-      )
-    );
+  // const updateRow = (id, field, value) =>
+  //   setRows((prev) =>
+  //     prev.map((r) =>
+  //       r.id === id
+  //         ? {
+  //             ...r,
+  //             [field]:
+  //               field === "name"
+  //                 ? value
+  //                 : field === "optionId"
+  //                 ? value
+  //                 : Math.max(0, Number(value) || 0),
+  //           }
+  //         : r
+  //     )
+  //   );
+
+  const updateRow = (id, field, value) => {
+    setRows((prev) => {
+      const existing = prev.find((r) => r.id === id);
+
+      if (existing) {
+        // 🔹 Update existing row
+        return prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                [field]:
+                  field === "name"
+                    ? value
+                    : field === "optionId"
+                    ? value
+                    : Math.max(0, Number(value) || 0),
+              }
+            : r
+        );
+      } else {
+        // 🔹 Row not found → create a new one
+        const [typePart] = id.split("-");
+        const newRow = {
+          id,
+          type: typePart || "custom",
+          optionId: null,
+          name: field === "name" ? value : "",
+          watts: field === "watts" ? value : 0,
+          qty: field === "qty" ? value : 0,
+          isDefault: false,
+        };
+        return [...prev, newRow];
+      }
+    });
+  };
 
   const removeRow = (id) => setRows((prev) => prev.filter((r) => r.id !== id));
 
