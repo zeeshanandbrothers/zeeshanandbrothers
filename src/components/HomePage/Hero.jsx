@@ -10,7 +10,7 @@ const Hero = () => {
       {/* 🔹 Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
-        src="/videos/solar_panels.mp4" // <-- apna video path yahan do
+        src="/videos/solar_panels.mp4" // video path
         autoPlay
         loop
         muted
