@@ -128,7 +128,7 @@ const ApplianceTable = ({
                             key={item.id}
                             className="border-b hover:bg-gray-100"
                           >
-                            <td className="p-2">{item.label}</td>
+                            <td className="p-2 min-w-[160px]">{item.label}</td>
                             <td className="p-2 text-center">{item.watts}</td>
                             <td className="p-2 text-center">
                               <input
@@ -160,15 +160,15 @@ const ApplianceTable = ({
         </div>
         {/* 🔹 Custom Loads Section */}
         {rows.filter((r) => r.type === "custom").length > 0 && (
-          <div className="mt-6 border rounded-md bg-white overflow-hidden">
+          <div className="mt-6 border rounded-md bg-white ">
             <div className="px-4 py-2 bg-gray-100 font-semibold flex justify-between items-center">
               <span>Custom Loads</span>
-              <span className="text-xs text-gray-500 italic">
+              <span className="hidden sm:inline text-xs text-gray-500 italic">
                 Add your own appliances
               </span>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-blue-100 text-gray-700 font-semibold">
                   <tr>
@@ -190,7 +190,7 @@ const ApplianceTable = ({
                           <input
                             type="text"
                             placeholder="Enter item name"
-                            className="w-full border rounded px-2 py-1 focus:ring-1 focus:ring-blue-400"
+                            className="w-full border rounded px-2 py-1 focus:ring-1 focus:ring-blue-400 min-w-[150px]"
                             value={r.name}
                             onChange={(e) =>
                               updateRow(r.id, "name", e.target.value)
