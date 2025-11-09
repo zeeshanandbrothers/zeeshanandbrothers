@@ -17,7 +17,6 @@ const Hero = () => {
         playsInline
       />
 
-      {/* 🔹 Overlay for dark tint */}
       <div className="absolute inset-0 bg-background/50" />
 
       {/* 🔹 Content */}
