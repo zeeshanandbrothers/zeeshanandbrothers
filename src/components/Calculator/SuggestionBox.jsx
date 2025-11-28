@@ -7,7 +7,7 @@ import {
 } from "@/data/ApplianceData";
 import { useEffect, useState } from "react";
 
-const SuggestionBox = ({ calc }) => {
+const SuggestionBox = ({ calc, systemType }) => {
   const {
     totalWatts,
     inverterKVA,
@@ -18,11 +18,20 @@ const SuggestionBox = ({ calc }) => {
     approxCostPKR,
   } = calc;
 
-  const [systemType, setSystemType] = useState("hybrid");
+  const [selectedSystemType, setSelectedSystemType] = useState(
+    systemType || "hybrid"
+  );
+
+  useEffect(() => {
+    if (systemType) {
+      setSelectedSystemType(systemType); // 🔥 FIX APPLIED
+    }
+  }, [systemType]);
+
   // --- Catalogs filter by systemType ---
-  const panelCatalog = PANELS_CATALOG[systemType] || [];
-  const batteryCatalog = BATTERIES_CATALOG[systemType] || [];
-  const inverterCatalog = INVERTERS_CATALOG[systemType] || [];
+  const panelCatalog = PANELS_CATALOG[selectedSystemType] || [];
+  const batteryCatalog = BATTERIES_CATALOG[selectedSystemType] || [];
+  const inverterCatalog = INVERTERS_CATALOG[selectedSystemType] || [];
   console.log("panel", panelCatalog);
   console.log("inv", inverterCatalog);
 
@@ -39,7 +48,7 @@ const SuggestionBox = ({ calc }) => {
     if (batteryCatalog.length > 0) setSelectedBatteryId(batteryCatalog[0].id);
     if (inverterCatalog.length > 0)
       setSelectedInverterId(inverterCatalog[0].id);
-  }, [systemType, panelCatalog, batteryCatalog, inverterCatalog]);
+  }, [selectedSystemType, panelCatalog, batteryCatalog, inverterCatalog]);
 
   // --- Find selected items
   const selectedPanel =
@@ -67,7 +76,7 @@ const SuggestionBox = ({ calc }) => {
   const whatsappMessage = `
 🌞 *Solar System Quotation Request* 🌞
 
-*System Type:* ${systemType.toUpperCase()}
+*System Type:* ${selectedSystemType.toUpperCase()}
 *Total Load:* ${totalWatts.toLocaleString()} W
 *Inverter Required:* ${inverterKVA} kVA
 *Battery Capacity:* ${batteryAh} Ah
@@ -75,7 +84,7 @@ const SuggestionBox = ({ calc }) => {
 🔹 *Suggested Equipment:*
 • Panel: ${selectedPanel?.name} (${selectedPanel?.watt}W × ${platesNeeded} pcs)
 ${
-  systemType !== "onGrid"
+  selectedSystemType !== "onGrid"
     ? `• Battery: ${selectedBattery?.name} (${selectedBattery?.ah}Ah)`
     : ""
 }
@@ -98,8 +107,8 @@ ${
         </h3>
         <select
           className="border rounded px-2 py-1 mb-4 sm:w-50 w-full"
-          value={systemType}
-          onChange={(e) => setSystemType(e.target.value)}
+          value={selectedSystemType}
+          onChange={(e) => setSelectedSystemType(e.target.value)}
         >
           <option value="hybrid">Hybrid System</option>
           <option value="onGrid">On-Grid System</option>

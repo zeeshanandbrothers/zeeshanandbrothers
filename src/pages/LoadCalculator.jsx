@@ -12,8 +12,7 @@ const LoadCalculator = () => {
   const [rows, setRows] = useState(DEFAULT_ROWS);
   const [isCalculationAllowed, setIsCalculationAllowed] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
-  console.log("showSum", showSummary);
-  console.log("iscal", isCalculationAllowed);
+  const [systemType, setSystemType] = useState(null); // NEW
 
   useEffect(() => {
     const allowed = rows.some((r) => {
@@ -208,11 +207,14 @@ const LoadCalculator = () => {
           addCustom={addCustom}
           onSelectOption={onSelectOption}
           onCalculate={() => setShowSummary(true)}
+          setSystemType={setSystemType}
         />
         {showSummary && isCalculationAllowed && (
           <>
             <SummaryCard calc={calc} />
-            <SuggestionBox calc={calc} />
+            {systemType && (
+              <SuggestionBox calc={calc} systemType={systemType} />
+            )}
           </>
         )}
       </div>

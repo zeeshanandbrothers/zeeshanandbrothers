@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { APPLIANCE_OPTIONS } from "../../data/ApplianceData";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import SystemTypePopup from "./SystemTypePopup";
 
 const ApplianceTable = ({
   rows,
@@ -9,7 +10,10 @@ const ApplianceTable = ({
   onCalculate,
   addCustom,
   removeRow,
+  setSystemType,
 }) => {
+  const [showPopup, setShowPopup] = useState(false);
+
   const [appliances, setAppliances] = useState({});
   const [isCalculationAllowed, setIsCalculationAllowed] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -80,9 +84,17 @@ const ApplianceTable = ({
       .flat()
       .reduce((sum, i) => sum + (i.total || 0), 0);
 
+    if (totalLoad <= 0) return;
+
+    setShowPopup(true); // POPUP OPEN HOGA
     onCalculate?.(totalLoad);
   };
-
+  const handleSystemSelect = (type) => {
+    console.log("type", type);
+    setShowPopup(false);
+    setSystemType(type); // 🔥 yahan parent ko systemType bhej dia
+    onCalculate?.(); // ab calculation + suggestion render ho jayega
+  };
   return (
     <div className="md:col-span-2">
       <div className="rounded-lg border bg-card p-4 shadow-sm">
@@ -291,6 +303,12 @@ const ApplianceTable = ({
           </div>
         </div>
       </div>
+      {showPopup && (
+        <SystemTypePopup
+          onSelect={handleSystemSelect}
+          onClose={() => setShowPopup(false)}
+        />
+      )}
     </div>
   );
 };
