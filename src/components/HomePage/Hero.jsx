@@ -10,11 +10,16 @@ const Hero = () => {
       {/* 🔹 Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
-        src="/videos/solar_panels.mp4" // video path
+        src="/videos/solar_panel.mp4"
         autoPlay
         loop
         muted
         playsInline
+        ref={(video) => {
+          if (video) {
+            video.playbackRate = 0.5; // speed slow (0.5 = half speed)
+          }
+        }}
       />
 
       <div className="absolute inset-0 bg-background/50" />
