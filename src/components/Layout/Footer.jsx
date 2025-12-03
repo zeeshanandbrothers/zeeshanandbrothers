@@ -1,8 +1,10 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import logo from "../../../public/images/logo.png";
 import React from "react";
 const Footer = () => {
+  const pathname = usePathname();
   const navLinks = [
     {
       name: "Features",
@@ -143,6 +145,9 @@ const Footer = () => {
       ),
     },
   ];
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
   return (
     <footer className="py-10 px-4 sm:px-6 lg:px-8 border-t border-border/60 bg-background/70  shadow-[0_-2px_8px_-2px_rgba(0,0,0,0.1)] font-inter relative overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col items-center relative z-10">

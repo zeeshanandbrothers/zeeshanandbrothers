@@ -3,12 +3,14 @@
 
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const Header = () => {
   const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
   // const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   // useEffect(() => {
   //   const onScroll = () => setScrolled(window.scrollY > 8);
@@ -16,6 +18,11 @@ const Header = () => {
   //   window.addEventListener("scroll", onScroll, { passive: true });
   //   return () => window.removeEventListener("scroll", onScroll);
   // }, []);
+
+  // Hide header on admin routes
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <header
