@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // ⭐ ADD THIS
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   LogOut,
@@ -9,118 +9,168 @@ import {
   Package,
   BarChart3,
   Settings,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
-  const hideSidebar = pathname === "/admin/login"; // ⭐ LOGIN PAGE → NO SIDEBAR
+  const hideUI = pathname === "/admin/login"; // hide navbar + sidebar on login page
+  const [openSidebar, setOpenSidebar] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const SIDEBAR_WIDTH = 256;
+
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setOpenSidebar(!mobile); // Desktop = open, Mobile = closed
+    };
+
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-    { icon: Package, label: "Products", href: "/admin/products" },
+    { icon: LayoutDashboard, label: "Products", href: "/admin" },
+    { icon: Package, label: "Add Products", href: "/admin/add-products" },
     { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
   ];
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/admin/logout", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+      await fetch("/api/admin/logout", {
+        method: "POST",
       });
-
-      if (!res.ok) {
-        console.log("Logout failed");
-        return;
-      }
 
       window.location.href = "/admin/login";
     } catch (error) {
-      console.log("error", error);
+      console.log("Logout error:", error);
     }
   };
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* ⭐ HIDE SIDEBAR ON LOGIN PAGE */}
-      {!hideSidebar && (
-        <motion.aside
-          initial={{ x: -250 }}
-          animate={{ x: 0 }}
-          transition={{ duration: 0.4 }}
-          className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col"
-        >
-          {/* Logo */}
-          <div className="p-6 border-b border-sidebar-border">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="flex items-center gap-3"
+      {/* NAVBAR */}
+      {!hideUI && (
+        <header className="fixed top-0 left-0 w-full z-40 bg-white border-b shadow-sm px-4 py-3 flex items-center justify-between">
+          {/* Left side logo + mobile menu button */}
+          <div className="flex items-center gap-3">
+            {/* Mobile toggle button */}
+            <button
+              className="md:hidden p-2 rounded hover:bg-gray-100"
+              onClick={() => setOpenSidebar(true)}
             >
-              <div className="">
-                <Link href="/" className="flex items-center gap-2">
-                  <img
-                    src="/images/logo.png"
-                    alt="Zeeshan & Brothers logo"
-                    className="h-8 w-auto rounded-sm ring-1 ring-border transition-transform duration-300 hover:scale-[1.03]"
-                  />
-                  <span className="text-sm font-semibold">
-                    Zeeshan &amp; Brothers
-                  </span>
-                </Link>
-              </div>
-              {/* <div>
-                <h1 className="font-bold text-lg text-foreground">Zeeshan</h1>
-                <p className="text-xs text-muted-foreground">Admin Panel</p>
-              </div> */}
-            </motion.div>
+              <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Logo */}
+            <Link href="/admin" className="flex items-center gap-2">
+              <img
+                src="/images/logo.png"
+                alt="Logo"
+                className="h-8 w-auto rounded"
+              />
+              <span className="font-semibold text-sm">Admin Panel</span>
+            </Link>
           </div>
 
-          {/* Menu Items */}
-          <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item, i) => (
-              <motion.div
-                key={item.href}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 * (i + 1) }}
-              >
-                <Link
-                  href={item.href}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-sidebar-primary/10 transition-colors group"
-                >
-                  <item.icon className="w-5 h-5 text-sidebar-accent group-hover:text-accent transition-colors" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </Link>
-              </motion.div>
-            ))}
-          </nav>
-
-          {/* Logout */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="p-4 border-t border-sidebar-border"
+          {/* Right side logout */}
+          <button
+            onClick={handleLogout}
+            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600"
           >
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-destructive/10 hover:bg-destructive/20 transition-colors text-destructive"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="text-sm font-medium">Logout</span>
-            </button>
-          </motion.div>
-        </motion.aside>
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </header>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      {/* ⭐ SIDEBAR (DESKTOP + MOBILE) */}
+      {!hideUI && (
+        <>
+          {/* Overlay for mobile */}
+          {isMobile && openSidebar && (
+            <div
+              className="fixed inset-0 bg-black/40 z-30 md:hidden"
+              onClick={() => setOpenSidebar(false)}
+            ></div>
+          )}
+
+          {/* Sidebar */}
+
+          <motion.aside
+            initial={isMobile ? { x: -SIDEBAR_WIDTH } : { x: 0 }}
+            animate={
+              isMobile ? { x: openSidebar ? 0 : -SIDEBAR_WIDTH } : { x: 0 }
+            }
+            transition={{ duration: 0.3 }}
+            className="
+    fixed md:relative
+    top-0 md:top-15
+    left-0
+    h-full md:h-[calc(100vh-60px)]
+    w-64
+    bg-sidebar border-r border-sidebar-border
+    z-50
+  "
+          >
+            {/* ⭐ Logo — ONLY MOBILE */}
+            <div className="p-6 border-b border-sidebar-border md:hidden flex justify-between items-center gap-3">
+              <Link href="/" className="flex items-center gap-2">
+                <img
+                  src="/images/logo.png"
+                  alt="Logo"
+                  className="h-8 w-auto rounded-sm"
+                />
+                <span className="text-sm font-semibold">
+                  Zeeshan & Brothers
+                </span>
+              </Link>
+              <button
+                className="cursor-pointer"
+                onClick={() => setOpenSidebar(false)}
+              >
+                <X className="w-6 h-6 " />
+              </button>
+            </div>
+
+            {/* Sidebar menu */}
+            <nav className="flex-1 p-4 space-y-2">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-sidebar-primary/10"
+                >
+                  <item.icon className="w-5 h-5 text-sidebar-accent" />
+                  <span className="text-sm font-medium">{item.label}</span>
+                </Link>
+              ))}
+            </nav>
+
+            {/* Logout — only mobile sidebar */}
+            <div className="md:hidden p-4 border-t border-sidebar-border">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/20 text-red-600 hover:bg-red-500/30"
+              >
+                <LogOut className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
+          </motion.aside>
+        </>
+      )}
+
+      {/* MAIN CONTENT */}
+      <main className={`flex-1 overflow-auto ${hideUI ? "" : "pt-16 "}`}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.3 }}
         >
           {children}
         </motion.div>

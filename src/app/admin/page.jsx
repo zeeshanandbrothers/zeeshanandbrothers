@@ -1,64 +1,38 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp, Package, ShoppingCart, DollarSign } from "lucide-react";
-import Link from "next/link";
+import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const StatCard = ({ icon: Icon, label, value, trend, color }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    whileHover={{ translateY: -4 }}
-    className="bg-card border border-border rounded-xl p-6 cursor-pointer"
-  >
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-muted-foreground text-sm font-medium">{label}</p>
-        <h3 className="text-3xl font-bold mt-2">{value}</h3>
-        {trend && (
-          <p className="text-xs mt-2 text-green-500">
-            {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}% from last month
-          </p>
-        )}
-      </div>
-      <div className={`p-3 rounded-lg ${color}`}>
-        <Icon className="w-6 h-6" />
-      </div>
-    </div>
-  </motion.div>
-);
-
-export default function AdminDashboard() {
-  const stats = [
+export default function ProductsPage() {
+  const router = useRouter();
+  const [products] = useState([
     {
-      label: "Total Products",
-      value: "24",
-      icon: Package,
-      trend: 12,
-      color: "bg-primary/10 text-primary",
+      id: 1,
+      name: "Solar Panel 400W",
+      price: 45000,
+      stock: 12,
+      status: "Active",
+      image: "🔆",
     },
     {
-      label: "Total Orders",
-      value: "1,234",
-      icon: ShoppingCart,
-      trend: 23,
-      color: "bg-accent/10 text-accent",
+      id: 2,
+      name: "Inverter 5KW",
+      price: 75000,
+      stock: 8,
+      status: "Active",
+      image: "⚡",
     },
     {
-      label: "Revenue",
-      value: "PKR 5.2M",
-      icon: DollarSign,
-      trend: 18,
-      color: "bg-secondary/10 text-secondary",
+      id: 3,
+      name: "Battery 200Ah",
+      price: 120000,
+      stock: 0,
+      status: "Out of Stock",
+      image: "🔋",
     },
-    {
-      label: "Growth Rate",
-      value: "24.5%",
-      icon: TrendingUp,
-      trend: 5,
-      color: "bg-green-500/10 text-green-500",
-    },
-  ];
+  ]);
 
   return (
     <div className="p-8">
@@ -66,91 +40,121 @@ export default function AdminDashboard() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="flex items-center justify-between mb-8"
       >
-        <h1 className="text-4xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Welcome back! Here's your business overview.
-        </p>
+        <div>
+          <h1 className="text-4xl font-bold">Products</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage your solar products
+          </p>
+        </div>
+        {/* <motion.button
+          onClick={() => router.push("/admin/add-product")}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex items-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
+        >
+          <Plus className="w-5 h-5" />
+          Add Product
+        </motion.button> */}
       </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <StatCard {...stat} />
-          </motion.div>
-        ))}
-      </div>
+      {/* Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="relative mb-6"
+      >
+        <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="w-full pl-10 pr-4 py-2 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </motion.div>
 
-      {/* Quick Actions */}
+      {/* Products Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        transition={{ delay: 0.2 }}
+        className="bg-card border border-border rounded-xl overflow-hidden"
       >
-        {/* Recent Products */}
-        <div className="lg:col-span-2 bg-card border border-border rounded-xl p-6">
-          <h2 className="text-xl font-bold mb-4">Recent Products</h2>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
+        <table className="w-full">
+          <thead className="bg-muted/30 border-b border-border">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Product
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Price
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Stock
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Status
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product, i) => (
+              <motion.tr
+                key={product.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-                className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/40 transition-colors"
+                transition={{ delay: 0.3 + i * 0.1 }}
+                className="border-b border-border hover:bg-muted/20 transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent" />
-                  <div>
-                    <p className="font-medium">Solar Panel Pro {i}</p>
-                    <p className="text-xs text-muted-foreground">PKR 45,000</p>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-lg">
+                      {product.image}
+                    </div>
+                    <span className="font-medium">{product.name}</span>
                   </div>
-                </div>
-                <span className="text-xs px-2 py-1 bg-green-500/20 text-green-500 rounded">
-                  In Stock
-                </span>
-              </motion.div>
+                </td>
+                <td className="px-6 py-4 text-sm">
+                  PKR {product.price.toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-sm">{product.stock} units</td>
+                <td className="px-6 py-4">
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      product.stock > 0
+                        ? "bg-green-500/20 text-green-500"
+                        : "bg-red-500/20 text-red-500"
+                    }`}
+                  >
+                    {product.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary/20 transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </motion.button>
+                  </div>
+                </td>
+              </motion.tr>
             ))}
-          </div>
-          <Link
-            href="/admin/products"
-            className="mt-4 block text-center py-2 px-4 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
-          >
-            View All Products
-          </Link>
-        </div>
-
-        {/* Quick Start */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-6"
-        >
-          <h3 className="text-lg font-bold mb-4">Quick Start</h3>
-          <div className="space-y-2">
-            <Link
-              href="/admin/products"
-              className="block p-3 rounded-lg bg-background hover:bg-muted transition-colors text-sm font-medium"
-            >
-              ➕ Add New Product
-            </Link>
-            <button className="w-full p-3 rounded-lg bg-background hover:bg-muted transition-colors text-sm font-medium text-left">
-              📊 View Analytics
-            </button>
-            <button className="w-full p-3 rounded-lg bg-background hover:bg-muted transition-colors text-sm font-medium text-left">
-              ⚙️ Settings
-            </button>
-          </div>
-        </motion.div>
+          </tbody>
+        </table>
       </motion.div>
     </div>
   );
