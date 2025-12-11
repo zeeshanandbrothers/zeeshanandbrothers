@@ -1,161 +1,403 @@
 "use client";
-
-import { motion } from "framer-motion";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function AddProductsPage() {
-  const router = useRouter();
-  const [products] = useState([
-    {
-      id: 1,
-      name: "Solar Panel 400W",
-      price: 45000,
-      stock: 12,
-      status: "Active",
-      image: "🔆",
-    },
-    {
-      id: 2,
-      name: "Inverter 5KW",
-      price: 75000,
-      stock: 8,
-      status: "Active",
-      image: "⚡",
-    },
-    {
-      id: 3,
-      name: "Battery 200Ah",
-      price: 120000,
-      stock: 0,
-      status: "Out of Stock",
-      image: "🔋",
-    },
-  ]);
+export default function AddProduct() {
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("panel");
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!imagePreview) {
+      alert("Please upload an image");
+      setLoading(false);
+      return;
+    }
+    const formData = new FormData(e.target);
+
+    const res = await fetch("/api/products", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setLoading(false);
+    console.log(data);
+    alert("Product Added!");
+  }
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between mb-8"
-      >
-        <div>
-          <h1 className="text-4xl font-bold">Products</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your solar products
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Add New Product
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Fill in the product details below
           </p>
         </div>
-        <motion.button
-          onClick={() => router.push("/admin/add-product")}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-4 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
-        >
-          <Plus className="w-5 h-5" />
-          Add Product
-        </motion.button>
-      </motion.div>
 
-      {/* Search */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="relative mb-6"
-      >
-        <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full pl-10 pr-4 py-2 rounded-lg bg-card border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </motion.div>
-
-      {/* Products Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-card border border-border rounded-xl overflow-hidden"
-      >
-        <table className="w-full">
-          <thead className="bg-muted/30 border-b border-border">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Product
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Price
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Stock
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Status
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product, i) => (
-              <motion.tr
-                key={product.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="border-b border-border hover:bg-muted/20 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-lg">
-                      {product.image}
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="">
+              <div className="flex items-center gap-4">
+                <label htmlFor="imageInput" className="cursor-pointer">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={imagePreview || "/placeholder.svg"}
+                        alt="Product preview"
+                        className="h-32 w-32 object-cover rounded-lg"
+                      />
                     </div>
-                    <span className="font-medium">{product.name}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  PKR {product.price.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 text-sm">{product.stock} units</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`text-xs px-3 py-1 rounded-full ${
-                      product.stock > 0
-                        ? "bg-green-500/20 text-green-500"
-                        : "bg-red-500/20 text-red-500"
-                    }`}
+                  ) : (
+                    <div className="flex items-center gap-5">
+                      <img src="/images/upload_area.png" alt="" />
+                      <p className="text-gray-600 font-semibold text-md max-w-[140px]">
+                        Upload product picture
+                      </p>
+                    </div>
+                  )}
+                </label>
+
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="imageInput"
+                />
+              </div>
+            </div>
+            {/* Product Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Product Name
+              </label>
+              <input
+                name="name"
+                placeholder="Enter product name"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                required
+              />
+            </div>
+            {/* Description - Full width */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Product Description
+              </label>
+              <textarea
+                name="description"
+                placeholder="Write about your product"
+                rows="4"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Brand */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Brand
+                </label>
+                <input
+                  name="brand"
+                  placeholder="Enter brand name"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Price
+                </label>
+                <input
+                  name="price"
+                  placeholder="Enter price"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
+
+              {/* Stock */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Stock
+                </label>
+                <input
+                  name="stock"
+                  placeholder="Enter stock quantity"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                >
+                  <option value="panel">Solar Panel</option>
+                  <option value="inverter">Inverter</option>
+                  <option value="battery">Battery</option>
+                  <option value="accessory">Accessory</option>
+                </select>
+              </div>
+            </div>
+
+            {category !== "accessory" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Watt
+                  </label>
+                  <input
+                    name="watt"
+                    placeholder="Enter watt"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Actual Watt
+                  </label>
+                  <input
+                    name="actualWatt"
+                    placeholder="Enter actual watt"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Inverter fields */}
+            {category === "inverter" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    System Type
+                  </label>
+                  <select
+                    name="systemType"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   >
-                    {product.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary/20 transition-colors"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </motion.button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </motion.div>
+                    <option value="">Select system type</option>
+                    <option value="ongrid">OnGrid</option>
+                    <option value="offgrid">OffGrid</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Phase
+                  </label>
+                  <select
+                    name="phase"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="">Select phase</option>
+                    <option value="single">Single</option>
+                    <option value="three">Three</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Battery fields */}
+            {category === "battery" && (
+              <div className="">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Battery AH
+                </label>
+                <input
+                  name="Ah"
+                  placeholder="Enter battery AH"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-blue-400"
+            >
+              {loading ? "Uploading..." : "Add Product"}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
+
+// "use client";
+// import { useState } from "react";
+
+// export default function AddProduct() {
+//   const [loading, setLoading] = useState(false);
+//   const [category, setCategory] = useState("panel");
+
+//   async function handleSubmit(e) {
+//     e.preventDefault();
+//     setLoading(true);
+
+//     const formData = new FormData(e.target);
+
+//     const res = await fetch("/api/products", {
+//       method: "POST",
+//       body: formData,
+//     });
+
+//     const data = await res.json();
+//     setLoading(false);
+//     console.log(data);
+//     alert("Product Added!");
+//   }
+
+//   return (
+//     <div className="max-w-xl mx-auto p-6 bg-white shadow rounded mt-5">
+//       <h2 className="text-2xl font-bold mb-4">Add Product</h2>
+
+//       <form onSubmit={handleSubmit} className="space-y-4">
+//         {/* Name */}
+//         <input
+//           name="name"
+//           placeholder="Product Name"
+//           className="border p-2 w-full"
+//           required
+//         />
+//         {/* Desc */}
+//         <textarea
+//           name="description"
+//           placeholder="Product Description"
+//           className="border p-2 w-full"
+//           required
+//         />
+
+//         {/* Brand */}
+//         <input
+//           name="brand"
+//           placeholder="Brand"
+//           className="border p-2 w-full"
+//           required
+//         />
+
+//         {/* Category */}
+//         <select
+//           name="category"
+//           className="border p-2 w-full"
+//           value={category}
+//           onChange={(e) => setCategory(e.target.value)}
+//           required
+//         >
+//           <option value="panel">Solar Panel</option>
+//           <option value="inverter">Inverter</option>
+//           <option value="battery">Battery</option>
+//           <option value="accessory">Accessory</option>
+//         </select>
+
+//         {/* Price */}
+//         <input
+//           name="price"
+//           placeholder="Price"
+//           className="border p-2 w-full"
+//           required
+//         />
+//         {/* Stock */}
+//         <input
+//           name="stock"
+//           placeholder="Stock"
+//           className="border p-2 w-full"
+//           required
+//         />
+
+//         {/* Image */}
+//         <input
+//           type="file"
+//           name="image"
+//           accept="image/*"
+//           className="border p-2 w-full"
+//           required
+//         />
+
+//         {/* CATEGORY-SPECIFIC FIELDS */}
+//         {category !== "accessory" && (
+//           <>
+//             <input
+//               name="watt"
+//               placeholder="Watt"
+//               className="border p-2 w-full"
+//             />
+
+//             <input
+//               name="actualWatt"
+//               placeholder="Actual Watt"
+//               className="border p-2 w-full"
+//             />
+//           </>
+//         )}
+
+//         {/* Inverter fields */}
+//         {category === "inverter" && (
+//           <>
+//             <select name="systemType" className="border p-2 w-full">
+//               <option value="">System Type</option>
+//               <option value="ongrid">OnGrid</option>
+//               <option value="offgrid">OffGrid</option>
+//               <option value="hybrid">Hybrid</option>
+//             </select>
+
+//             <select name="phase" className="border p-2 w-full">
+//               <option value="">Phase</option>
+//               <option value="single">Single</option>
+//               <option value="three">Three</option>
+//             </select>
+//           </>
+//         )}
+
+//         {/* Battery */}
+//         {category === "battery" && (
+//           <input
+//             name="Ah"
+//             placeholder="Battery AH"
+//             className="border p-2 w-full"
+//           />
+//         )}
+
+//         <button
+//           type="submit"
+//           disabled={loading}
+//           className="w-full bg-blue-600 text-white py-2 rounded"
+//         >
+//           {loading ? "Uploading..." : "Add Product"}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }

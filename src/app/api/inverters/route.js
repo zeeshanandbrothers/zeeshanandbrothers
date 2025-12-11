@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import Inverter from "@/models/Inverter";
+import Inverter from "@/models/Product";
 
 // GET ALL INVERTERS
 export async function GET() {
