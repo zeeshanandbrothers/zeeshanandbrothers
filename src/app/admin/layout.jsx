@@ -35,8 +35,7 @@ export default function AdminLayout({ children }) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Products", href: "/admin" },
     { icon: Package, label: "Add Products", href: "/admin/add-products" },
-    { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
+    { icon: Settings, label: "Profile", href: "/admin/profile" },
   ];
 
   const handleLogout = async () => {

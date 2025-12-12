@@ -70,19 +70,3 @@ const Accessory =
 export { Product, Panel, Inverter, Battery, Accessory };
 export default Product;
 
-// import mongoose from "mongoose";
-
-// const productSchema = new mongoose.Schema(
-//   {
-//     title: { type: String, required: true }, // e.g. “Knox Eco 3kW pv4000”
-//     category: { type: String, required: true }, // Off-Grid, On-Grid...
-//     image: { type: String, required: true }, // Image URL
-//     price: { type: String, required: true }, // “79k”
-//     description: { type: String, required: true }, // Full description text
-//     technicalSpecs: { type: String }, // Long text block (free-form)
-//   },
-//   { timestamps: true }
-// );
-
-// export default mongoose.models.Product ||
-//   mongoose.model("Product", productSchema);

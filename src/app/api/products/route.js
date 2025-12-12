@@ -84,14 +84,32 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+// export async function GET() {
+//   try {
+//     await connectDB();
+
+//     const products = await Product.find().sort({ createdAt: -1 });
+
+//     return NextResponse.json(products);
+//   } catch (error) {
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+// }
+
+export async function GET(request) {
   try {
     await connectDB();
 
-    const products = await Product.find().sort({ createdAt: -1 });
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category");
 
+    let query = {};
+
+    if (category) query.category = category;
+
+    const products = await Product.find(query);
     return NextResponse.json(products);
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
