@@ -1,16 +1,15 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     const email = e.target.email.value;
     const password = e.target.password.value;
@@ -23,17 +22,20 @@ export default function AdminLogin() {
       });
 
       const data = await res.json();
-      console.log("data", data);
+      if (data.success) {
+        toast.success(data.message);
+      }
 
       if (!res.ok) {
-        setError(data.error || "Login failed");
+        toast.error(data.error || "login failed");
         setLoading(false);
         return;
       }
 
       window.location.href = "/admin"; // redirect
     } catch (error) {
-      setError("Something went wrong");
+      toast.error(error || "login failed");
+      console.log(error);
       setLoading(false);
     }
   };
@@ -44,12 +46,6 @@ export default function AdminLogin() {
         <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
           Admin Login
         </h1>
-
-        {error && (
-          <div className="mb-4 bg-red-100 text-red-700 px-4 py-2 rounded">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
@@ -73,6 +69,12 @@ export default function AdminLogin() {
               placeholder="Enter password"
             />
           </div>
+          <p
+            className="text-blue-500 text-right cursor-pointer"
+            onClick={() => router.push("/admin/forgot-password")}
+          >
+            Forgot Password?
+          </p>
 
           <button
             type="submit"

@@ -15,7 +15,11 @@ import {
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
-  const hideUI = pathname === "/admin/login"; // hide navbar + sidebar on login page
+  const hideUI =
+    pathname === "/admin/login" ||
+    pathname === "/admin/forgot-password" ||
+    pathname === "/admin/reset-password" ||
+    pathname === "/admin/verify-otp"; // hide navbar + sidebar on login page
   const [openSidebar, setOpenSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const SIDEBAR_WIDTH = 256;

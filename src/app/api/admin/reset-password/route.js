@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import Admin from "@/models/Admin";
+import { connectDB } from "../../../../lib/db";
+import Admin from "../../../../models/Admin";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -18,6 +18,10 @@ export async function POST(req) {
 
     if (admin.otpExpires < new Date())
       return NextResponse.json({ error: "OTP expired" }, { status: 400 });
+
+    if (!newPassword) {
+      return NextResponse.json({ success: true, message: "OTP verified" });
+    }
 
     admin.password = await bcrypt.hash(newPassword, 10);
     admin.otp = null;

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AddProduct() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function AddProduct() {
     setLoading(true);
 
     if (!imagePreview) {
-      alert("Please upload an image");
+      toast.error("Please upload an image");
       setLoading(false);
       return;
     }
@@ -36,7 +37,7 @@ export default function AddProduct() {
     const data = await res.json();
     setLoading(false);
     console.log(data);
-    alert("Product Added!");
+    toast.success("Product Added Successfully!");
   }
 
   return (

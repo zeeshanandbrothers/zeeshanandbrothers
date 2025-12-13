@@ -37,7 +37,10 @@ export async function POST(req) {
       text: `Your OTP is: ${otp}. Valid for 10 minutes.`,
     });
 
-    return NextResponse.json({ success: true, message: "OTP sent to email." });
+    return NextResponse.json({
+      success: true,
+      message: "OTP sent to your email.",
+    });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
