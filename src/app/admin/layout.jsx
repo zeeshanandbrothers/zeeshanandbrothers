@@ -83,7 +83,7 @@ export default function AdminLayout({ children }) {
           {/* Right side logout */}
           <button
             onClick={handleLogout}
-            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600"
+            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer bg-red-500 text-white text-sm hover:bg-red-600"
           >
             <LogOut className="w-4 h-4" />
             Logout

@@ -112,7 +112,7 @@ export default function ProductListing() {
             </thead>
 
             <tbody>
-              {products.map((p) => (
+              {products?.map((p) => (
                 <tr key={p._id} className="text-center border">
                   <td className="p-2 border">
                     <img src={p.image} className="h-12 mx-auto" />

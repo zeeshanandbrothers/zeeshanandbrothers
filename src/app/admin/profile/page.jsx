@@ -1,77 +1,131 @@
 "use client";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
-import { motion } from "framer-motion";
-import { Save } from "lucide-react";
+export default function AdminProfile() {
+  const [admin, setAdmin] = useState(null);
+  console.log("admin", admin);
+  const [open, setOpen] = useState(false);
 
-export default function SettingsPage() {
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then((res) => res.json())
+      .then(setAdmin);
+  }, []);
+
+  if (!admin) return <p className="p-6">Loading...</p>;
+
   return (
-    <div className="p-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-4xl font-bold">Settings</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage your business settings
+    <div className="p-6 max-w-xl">
+      <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+
+      <div className="bg-white shadow rounded p-4 space-y-2">
+        <p>
+          <b>Name:</b> {admin.name}
         </p>
-      </motion.div>
+        <p>
+          <b>Email:</b> {admin.email}
+        </p>
 
-      <div className="max-w-2xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card border border-border rounded-xl p-6 space-y-6"
+        <button
+          onClick={() => setOpen(true)}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
         >
-          {/* Business Info */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">
-              Business Name
-            </label>
-            <input
-              type="text"
-              defaultValue="Zeeshan & Brothers"
-              className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+          Edit Profile
+        </button>
+      </div>
 
-          <div>
-            <label className="block text-sm font-semibold mb-2">Email</label>
-            <input
-              type="email"
-              defaultValue="info@zeeshan.com"
-              className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+      {open && <EditProfileModal admin={admin} close={() => setOpen(false)} />}
+    </div>
+  );
+}
 
-          <div>
-            <label className="block text-sm font-semibold mb-2">Phone</label>
-            <input
-              type="tel"
-              defaultValue="+92 300 1234567"
-              className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+function EditProfileModal({ admin, close }) {
+  const [loading, setLoading] = useState(false);
 
-          <div>
-            <label className="block text-sm font-semibold mb-2">Address</label>
-            <textarea
-              defaultValue="123 Solar Street, Lahore, Pakistan"
-              rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
+    const body = {
+      id: admin._id,
+      name: e.target.name.value,
+      email: e.target.email.value,
+      oldPassword: e.target.oldPassword.value,
+      newPassword: e.target.newPassword.value,
+    };
+
+    const res = await fetch("/api/admin/update-profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (data.success) {
+      toast.success("Profile updated!");
+      close();
+      location.reload();
+    } else {
+      toast.error(data.error);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded w-full max-w-md relative">
+        <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
+
+        <button
+          className="absolute top-2 right-3 cursor-pointer"
+          onClick={close}
+        >
+          ✕
+        </button>
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <label>Name</label>
+          <input
+            name="name"
+            defaultValue={admin.name}
+            className="border p-2 w-full"
+            required
+          />
+
+          <label>Email</label>
+          <input
+            name="email"
+            type="email"
+            defaultValue={admin.email}
+            className="border p-2 w-full"
+            required
+          />
+
+          <label>Old Password</label>
+          <input
+            name="oldPassword"
+            type="password"
+            className="border p-2 w-full"
+          />
+
+          <label>New Password</label>
+          <input
+            name="newPassword"
+            type="password"
+            className="border p-2 w-full"
+          />
+
+          <button
+            disabled={loading}
+            className={`w-full py-2 text-white rounded cursor-pointer ${
+              loading ? "bg-gray-400" : "bg-blue-600"
+            }`}
           >
-            <Save className="w-5 h-5" />
-            Save Changes
-          </motion.button>
-        </motion.div>
+            {loading ? "Updating..." : "Update"}
+          </button>
+        </form>
       </div>
     </div>
   );
