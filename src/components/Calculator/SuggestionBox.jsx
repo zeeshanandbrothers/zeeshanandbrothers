@@ -22,6 +22,39 @@ const SuggestionBox = ({ calc, systemType }) => {
     systemType || "hybrid"
   );
 
+  const [apiInverters, setApiInverters] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  console.log("totalWatts", calc?.totalWatts);
+  console.log("systemType", systemType);
+  useEffect(() => {
+    if (!calc?.totalWatts || !systemType) return;
+
+    const fetchSuggestions = async () => {
+      setLoading(true);
+
+      const res = await fetch("/api/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          load: calc.totalWatts,
+          systemType,
+        }),
+      });
+
+      const data = await res.json();
+      console.log("dataaaaa", data);
+
+      if (data.success) {
+        setApiInverters(data.suggestions);
+      }
+
+      setLoading(false);
+    };
+
+    fetchSuggestions();
+  }, [calc.totalWatts, systemType]);
+
   useEffect(() => {
     if (systemType) {
       setSelectedSystemType(systemType); // 🔥 FIX APPLIED
@@ -31,9 +64,8 @@ const SuggestionBox = ({ calc, systemType }) => {
   // --- Catalogs filter by systemType ---
   const panelCatalog = PANELS_CATALOG[selectedSystemType] || [];
   const batteryCatalog = BATTERIES_CATALOG[selectedSystemType] || [];
-  const inverterCatalog = INVERTERS_CATALOG[selectedSystemType] || [];
-  console.log("panel", panelCatalog);
-  console.log("inv", inverterCatalog);
+  const inverterCatalog = apiInverters;
+  console.log("inverter", inverterCatalog);
 
   // --- States for selected items ---
   const [selectedPanelId, setSelectedPanelId] = useState(bestPanel?.id);
@@ -46,17 +78,28 @@ const SuggestionBox = ({ calc, systemType }) => {
   useEffect(() => {
     if (panelCatalog.length > 0) setSelectedPanelId(panelCatalog[0].id);
     if (batteryCatalog.length > 0) setSelectedBatteryId(batteryCatalog[0].id);
-    if (inverterCatalog.length > 0)
-      setSelectedInverterId(inverterCatalog[0].id);
-  }, [selectedSystemType, panelCatalog, batteryCatalog, inverterCatalog]);
+    if (apiInverters.length > 0 && !selectedInverterId) {
+      setSelectedInverterId(apiInverters[0]._id);
+    }
+  }, [
+    apiInverters,
+    selectedSystemType,
+    panelCatalog,
+    batteryCatalog,
+    inverterCatalog,
+  ]);
 
   // --- Find selected items
   const selectedPanel =
     panelCatalog.find((p) => p.id === selectedPanelId) || bestPanel;
   const selectedBattery =
     batteryCatalog.find((b) => b.id === selectedBatteryId) || bestBattery;
-  const selectedInverter =
-    inverterCatalog.find((i) => i.id === selectedInverterId) || bestInverter;
+  // const selectedInverter =
+  //   inverterCatalog.find((i) => i.id === selectedInverterId) || bestInverter;
+  const selectedInverter = apiInverters.find(
+    (inv) => inv._id === selectedInverterId
+  );
+  console.log("selectedInverter", selectedInverter);
 
   const platesNeeded = selectedPanel?.actualWatt
     ? Math.ceil(totalWatts / selectedPanel.actualWatt)
@@ -99,6 +142,21 @@ ${
     whatsappMessage
   )}`;
 
+  if (loading) {
+    return (
+      <div className="border rounded p-4 text-center">
+        Calculating best inverter for your load...
+      </div>
+    );
+  }
+
+  if (!apiInverters.length) {
+    return (
+      <div className="border rounded p-4 text-center text-red-500">
+        No suitable inverter found for your load.
+      </div>
+    );
+  }
   return (
     <div className="rounded-lg border bg-card p-5 shadow-[0_0_15px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
@@ -199,46 +257,75 @@ ${
       )} */}
 
       {/* ⚙️ Inverter Section */}
-      {selectedInverter && (
+      {/* {loading && (
+        <div className="text-center text-sm text-muted-foreground">
+          Loading inverter suggestions...
+        </div>
+      )} */}
+
+      {!loading && apiInverters.length > 0 && (
         <div className="mb-5 border p-5 rounded-md shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-            <h4 className="font-semibold">Inverter</h4>
-            <select
-              className="border rounded px-2 py-1"
-              value={selectedInverterId}
-              onChange={(e) => setSelectedInverterId(e.target.value)}
-            >
-              {inverterCatalog.map((inv) => (
-                <option key={inv.id} value={inv.id}>
-                  {inv.brand} {inv.kva}kVA
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 mt-2">
-            <img
-              src={selectedInverter.imgUrl}
-              alt={selectedInverter.name}
-              className="w-full h-full sm:w-24 sm:h-24 object-cover rounded"
-            />
-            <div>
-              <p className="font-semibold">{selectedInverter.name}</p>
-              <p className="text-sm text-muted-foreground">
-                {selectedInverter.brand}
-              </p>
-              <p>
-                PKR{" "}
-                <span className="font-semibold">
-                  {selectedInverter.pricePKR.toLocaleString()}
-                </span>
-              </p>
-              <p>{selectedInverter.kva} kVA Capacity</p>
-              <p>
-                You need <strong>{inverterNeeded}</strong> inverter(s) of{" "}
-                {selectedInverter.kva} kVA ({selectedInverter.actualWatt}W
-                actual)
-              </p>
-            </div>
+          <h4 className="font-semibold mb-4">Suggested Inverters</h4>
+
+          <div className="space-y-4">
+            {apiInverters.map((inv, index) => {
+              const isSelected = selectedInverterId === inv._id;
+
+              return (
+                <div
+                  key={inv._id}
+                  onClick={() => setSelectedInverterId(inv._id)}
+                  className={`cursor-pointer border rounded-md p-4 flex gap-4 items-start
+              ${isSelected ? "border-blue-600 bg-blue-50" : "border-gray-200"}
+            `}
+                >
+                  {/* 🔘 Radio */}
+                  <input
+                    type="radio"
+                    name="selectedInverter"
+                    checked={isSelected}
+                    onChange={() => setSelectedInverterId(inv._id)}
+                    className="mt-1"
+                  />
+
+                  {/* 🖼 Image */}
+                  <img
+                    src={inv.image}
+                    alt={inv.name}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+
+                  {/* 📄 Info */}
+                  <div className="flex-1">
+                    <p className="font-semibold">{inv.name}</p>
+                    <p className="text-sm text-muted-foreground">{inv.brand}</p>
+
+                    <p className="mt-1">
+                      Capacity: {inv.watt / 1000}kW ({inv.actualWatt}W actual)
+                    </p>
+
+                    <p>
+                      PKR{" "}
+                      <span className="font-semibold">
+                        {inv.price.toLocaleString()}
+                      </span>
+                    </p>
+
+                    <p className="text-sm mt-1">
+                      You need{" "}
+                      <strong>{Math.ceil(totalWatts / inv.actualWatt)}</strong>{" "}
+                      inverter(s)
+                    </p>
+
+                    {/* {index === 0 && (
+                      <span className="inline-block mt-2 text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
+                        Recommended
+                      </span>
+                    )} */}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

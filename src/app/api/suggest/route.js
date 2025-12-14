@@ -16,15 +16,21 @@ export async function POST(req) {
       );
     }
 
+    const minWatt = Math.floor(load * 0.8); // -20%
+    const maxWatt = Math.ceil(load * 1.25); // +25%
+
     const inverters = await Inverter.find({
       systemType,
-      actualWatt: { $gte: load }, // 🔥 key logic
-    })
-      .sort({ actualWatt: 1 }) // nearest first
-      .limit(5); // optional: top 5 suggestions
+      actualWatt: {
+        $gte: minWatt,
+        $lte: maxWatt,
+      },
+    }).sort({ actualWatt: 1 });
 
     return NextResponse.json({
       success: true,
+      load,
+      range: { minWatt, maxWatt },
       count: inverters.length,
       suggestions: inverters,
     });
