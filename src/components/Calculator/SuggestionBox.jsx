@@ -13,7 +13,6 @@ const SuggestionBox = ({ calc, systemType }) => {
     inverterKVA,
     batteryAh,
     bestPanel,
-    bestInverter,
     bestBattery,
     approxCostPKR,
   } = calc;
@@ -23,27 +22,29 @@ const SuggestionBox = ({ calc, systemType }) => {
   );
 
   const [apiInverters, setApiInverters] = useState([]);
+  const [apiPanels, setApiPanels] = useState([]);
+  const [requiredPanels, setRequiredPanels] = useState();
   const [loading, setLoading] = useState(false);
+  const [selectedPanelId, setSelectedPanelId] = useState(null);
+  const [selectedInverterId, setSelectedInverterId] = useState(null);
 
-  console.log("totalWatts", calc?.totalWatts);
-  console.log("systemType", systemType);
   useEffect(() => {
     if (!calc?.totalWatts || !systemType) return;
 
     const fetchSuggestions = async () => {
       setLoading(true);
 
-      const res = await fetch("/api/suggest", {
+      const res = await fetch("/api/suggested-inverters", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           load: calc.totalWatts,
-          systemType,
+          selectedSystemType,
         }),
       });
 
       const data = await res.json();
-      console.log("dataaaaa", data);
+      console.log("data", data);
 
       if (data.success) {
         setApiInverters(data.suggestions);
@@ -53,57 +54,68 @@ const SuggestionBox = ({ calc, systemType }) => {
     };
 
     fetchSuggestions();
-  }, [calc.totalWatts, systemType]);
+  }, [calc.totalWatts, selectedSystemType]);
 
   useEffect(() => {
     if (systemType) {
       setSelectedSystemType(systemType); // 🔥 FIX APPLIED
     }
   }, [systemType]);
+  useEffect(() => {
+    if (!totalWatts) return;
+
+    const fetchPanels = async () => {
+      const res = await fetch("/api/suggested-panels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ load: totalWatts }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // 🔥 selected + alternatives merge
+        const allPanels = [data.selectedPanel, ...data.alternatives];
+
+        setApiPanels(allPanels);
+        setSelectedPanelId(data.selectedPanel._id); // default select
+      }
+    };
+
+    fetchPanels();
+  }, [totalWatts]);
 
   // --- Catalogs filter by systemType ---
-  const panelCatalog = PANELS_CATALOG[selectedSystemType] || [];
+  // const panelCatalog = PANELS_CATALOG[selectedSystemType] || [];
   const batteryCatalog = BATTERIES_CATALOG[selectedSystemType] || [];
   const inverterCatalog = apiInverters;
-  console.log("inverter", inverterCatalog);
 
   // --- States for selected items ---
-  const [selectedPanelId, setSelectedPanelId] = useState(bestPanel?.id);
-  const [selectedBatteryId, setSelectedBatteryId] = useState(bestBattery?.id);
-  const [selectedInverterId, setSelectedInverterId] = useState(
-    bestInverter?.id
-  );
 
   // When systemType changes → reset selections
   useEffect(() => {
-    if (panelCatalog.length > 0) setSelectedPanelId(panelCatalog[0].id);
-    if (batteryCatalog.length > 0) setSelectedBatteryId(batteryCatalog[0].id);
+    // if (panelCatalog.length > 0) setSelectedPanelId(panelCatalog[0].id);
     if (apiInverters.length > 0 && !selectedInverterId) {
       setSelectedInverterId(apiInverters[0]._id);
     }
-  }, [
-    apiInverters,
-    selectedSystemType,
-    panelCatalog,
-    batteryCatalog,
-    inverterCatalog,
-  ]);
+  }, [apiInverters, selectedSystemType, batteryCatalog, inverterCatalog]);
 
   // --- Find selected items
-  const selectedPanel =
-    panelCatalog.find((p) => p.id === selectedPanelId) || bestPanel;
-  const selectedBattery =
-    batteryCatalog.find((b) => b.id === selectedBatteryId) || bestBattery;
-  // const selectedInverter =
-  //   inverterCatalog.find((i) => i.id === selectedInverterId) || bestInverter;
+  const selectedPanel = apiPanels.find((p) => p._id === selectedPanelId);
+  console.log("selectedPanel", selectedPanel);
+  const selectedBattery = {};
   const selectedInverter = apiInverters.find(
     (inv) => inv._id === selectedInverterId
   );
-  console.log("selectedInverter", selectedInverter);
+  console.log("actualWatt", selectedPanel?.actualWatt);
 
-  const platesNeeded = selectedPanel?.actualWatt
-    ? Math.ceil(totalWatts / selectedPanel.actualWatt)
-    : 0;
+  useEffect(() => {
+    const platesNeeded = selectedPanel?.actualWatt
+      ? Math.ceil(totalWatts / selectedPanel.actualWatt)
+      : 0;
+    console.log("platesNeeded", platesNeeded);
+    setRequiredPanels(platesNeeded);
+  }, [selectedPanelId, selectedPanel]);
 
   const inverterNeeded = selectedInverter?.actualWatt
     ? Math.ceil(totalWatts / selectedInverter.actualWatt)
@@ -125,7 +137,9 @@ const SuggestionBox = ({ calc, systemType }) => {
 *Battery Capacity:* ${batteryAh} Ah
 
 🔹 *Suggested Equipment:*
-• Panel: ${selectedPanel?.name} (${selectedPanel?.watt}W × ${platesNeeded} pcs)
+• Panel: ${selectedPanel?.name} (${
+    selectedPanel?.watt
+  }W × ${requiredPanels} pcs)
 ${
   selectedSystemType !== "onGrid"
     ? `• Battery: ${selectedBattery?.name} (${selectedBattery?.ah}Ah)`
@@ -184,8 +198,8 @@ ${
               value={selectedPanelId}
               onChange={(e) => setSelectedPanelId(e.target.value)}
             >
-              {panelCatalog.map((p) => (
-                <option key={p.id} value={p.id}>
+              {apiPanels.map((p) => (
+                <option key={p._id} value={p._id}>
                   {p.brand} {p.watt}W
                 </option>
               ))}
@@ -193,7 +207,7 @@ ${
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <img
-              src={selectedPanel.imgUrl}
+              src={selectedPanel.image}
               alt={selectedPanel.name}
               className="w-full h-full sm:w-24 sm:h-24 object-cover rounded"
             />
@@ -205,15 +219,16 @@ ${
               <p>
                 PKR{" "}
                 <span className="font-semibold">
-                  {selectedPanel.pricePKR.toLocaleString()}
+                  {selectedPanel.price.toLocaleString()}
                 </span>
               </p>
               <p>
-                You need <strong>{platesNeeded}</strong> panels of{" "}
+                You need <strong>{requiredPanels}</strong> panels of{" "}
                 {selectedPanel.watt} W
               </p>
             </div>
           </div>
+           
         </div>
       )}
 
