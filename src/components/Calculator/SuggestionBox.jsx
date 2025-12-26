@@ -39,7 +39,7 @@ const SuggestionBox = ({ calc, systemType }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           load: calc.totalWatts,
-          selectedSystemType,
+          systemType: selectedSystemType,
         }),
       });
 
