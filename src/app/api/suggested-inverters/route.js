@@ -80,75 +80,75 @@
 //   }
 // }
 
-// code 2
-// src/app/api/inverters/suggest/route.js
-import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { Inverter } from "@/models/Product";
+// // code 2
+// // src/app/api/suggested-inverters/route.js
+// import { NextResponse } from "next/server";
+// import { connectDB } from "@/lib/db";
+// import { Inverter } from "@/models/Product";
 
-export async function POST(req) {
-  try {
-    await connectDB();
+// export async function POST(req) {
+//   try {
+//     await connectDB();
 
-    const { load, systemType } = await req.json();
+//     const { load, systemType } = await req.json();
 
-    if (!load || !systemType) {
-      return NextResponse.json(
-        { error: "Load and systemType required" },
-        { status: 400 }
-      );
-    }
+//     if (!load || !systemType) {
+//       return NextResponse.json(
+//         { error: "Load and systemType required" },
+//         { status: 400 }
+//       );
+//     }
 
-    // 1️⃣ Get all inverters sorted by capacity (ASC)
-    const inverters = await Inverter.find({ systemType }).sort({
-      actualWatt: 1,
-    });
+//     // 1️⃣ Get all inverters sorted by capacity (ASC)
+//     const inverters = await Inverter.find({ systemType }).sort({
+//       actualWatt: 1,
+//     });
 
-    if (!inverters.length) {
-      return NextResponse.json({
-        success: false,
-        message: "No inverter available",
-      });
-    }
+//     if (!inverters.length) {
+//       return NextResponse.json({
+//         success: false,
+//         message: "No inverter available",
+//       });
+//     }
 
-    // 2️⃣ Try single inverter with 12% tolerance
-    const tolerance = 0.12;
-    const suitable = inverters.find((inv) => {
-      const maxAllowedLoad = inv.actualWatt * (1 + tolerance);
-      return load <= maxAllowedLoad;
-    });
+//     // 2️⃣ Try single inverter with 12% tolerance
+//     const tolerance = 0.12;
+//     const suitable = inverters.find((inv) => {
+//       const maxAllowedLoad = inv.actualWatt * (1 + tolerance);
+//       return load <= maxAllowedLoad;
+//     });
 
-    if (suitable) {
-      return NextResponse.json({
-        success: true,
-        strategy: "single-with-12-percent",
-        suggestions: [
-          {
-            ...suitable.toObject(),
-            quantity: 1,
-          },
-        ],
-      });
-    }
+//     if (suitable) {
+//       return NextResponse.json({
+//         success: true,
+//         strategy: "single-with-12-percent",
+//         suggestions: [
+//           {
+//             ...suitable.toObject(),
+//             quantity: 1,
+//           },
+//         ],
+//       });
+//     }
 
-    // 3️⃣ Fallback → multiple inverter strategy
-    const biggest = inverters[inverters.length - 1];
-    const quantity = Math.ceil(load / biggest.actualWatt);
+//     // 3️⃣ Fallback → multiple inverter strategy
+//     const biggest = inverters[inverters.length - 1];
+//     const quantity = Math.ceil(load / biggest.actualWatt);
 
-    return NextResponse.json({
-      success: true,
-      strategy: "multiple-inverters",
-      suggestions: [
-        {
-          ...biggest.toObject(),
-          quantity,
-        },
-      ],
-    });
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+//     return NextResponse.json({
+//       success: true,
+//       strategy: "multiple-inverters",
+//       suggestions: [
+//         {
+//           ...biggest.toObject(),
+//           quantity,
+//         },
+//       ],
+//     });
+//   } catch (error) {
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+// }
 
 // code 3
 // // src/app/api/inverters/suggest/route.js
@@ -246,3 +246,105 @@ export async function POST(req) {
 //     return NextResponse.json({ error: error.message }, { status: 500 });
 //   }
 // }
+
+
+// ibad code
+// code 4
+// src/app/api/suggested-inverters/route.js
+
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/db";
+import { Inverter } from "@/models/Product";
+
+export async function POST(req) {
+  try {
+    // Connect database
+    await connectDB();
+
+    // Read user input
+    const { load, systemType } = await req.json();
+
+    // Validate input
+    if (!load || !systemType) {
+      return NextResponse.json(
+        { error: "Load and systemType required" },
+        { status: 400 }
+      );
+    }
+
+    // Get inverters of given system type
+    // Sorted by actualWatt (small to big)
+    const inverters = await Inverter.find({ systemType }).sort({
+      actualWatt: 1,
+    });
+
+    // No inverter found
+    if (!inverters.length) {
+      return NextResponse.json({
+        success: false,
+        message: "No inverter available",
+      });
+    }
+
+    // Client rule: actual watt + 12%
+    const TOLERANCE = 0.12;
+
+    // Find the first inverter
+    // whose (actualWatt + 12%) can handle the load
+    const firstSuitableIndex = inverters.findIndex((inv) => {
+      const effectiveCapacity = inv.actualWatt * (1 + TOLERANCE);
+      return load <= effectiveCapacity;
+    });
+
+    // If no single inverter can handle the load
+    // use multiple inverter strategy
+    if (firstSuitableIndex === -1) {
+      const biggest = inverters[inverters.length - 1];
+      const quantity = Math.ceil(load / biggest.actualWatt);
+
+      return NextResponse.json({
+        success: true,
+        strategy: "multiple-inverters",
+        suggestions: [
+          {
+            ...biggest.toObject(),
+            quantity,
+            reason: "Load exceeds all single inverter capacities",
+          },
+        ],
+      });
+    }
+
+    // 🔒 LIMIT OPTIONS:
+    // Show only base inverter + next 2 capacity steps
+    const MAX_STEPS = 3; // base + 2 next
+
+    const limitedInverters = inverters.slice(
+      firstSuitableIndex,
+      firstSuitableIndex + MAX_STEPS
+    );
+
+    // Default selection:
+    // inverter with highest stock
+    const sortedByStock = [...limitedInverters].sort(
+      (a, b) => b.stock - a.stock
+    );
+
+    const defaultSelectedId = sortedByStock[0]._id.toString();
+
+    // Final response
+    return NextResponse.json({
+      success: true,
+      strategy: "single-with-12-percent-limited",
+      defaultSelectedId,
+      suggestions: limitedInverters.map((inv) => ({
+        ...inv.toObject(),
+        quantity: 1,
+        effectiveCapacity: Math.round(inv.actualWatt * (1 + TOLERANCE)),
+      })),
+    });
+  } catch (error) {
+    // Unexpected error
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
