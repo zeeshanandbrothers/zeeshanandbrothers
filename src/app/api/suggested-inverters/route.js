@@ -247,7 +247,6 @@
 //   }
 // }
 
-
 // ibad code
 // code 4
 // src/app/api/suggested-inverters/route.js
@@ -319,10 +318,16 @@ export async function POST(req) {
     // Show only base inverter + next 2 capacity steps
     const MAX_STEPS = 3; // base + 2 next
 
-    const limitedInverters = inverters.slice(
-      firstSuitableIndex,
-      firstSuitableIndex + MAX_STEPS
-    );
+    const limitedInverters = inverters
+      .slice(firstSuitableIndex, firstSuitableIndex + MAX_STEPS)
+      .sort((a, b) => {
+        // Same capacity → higher stock first
+        if (a.actualWatt === b.actualWatt) {
+          return b.stock - a.stock;
+        }
+        // Otherwise → smaller capacity first
+        return a.actualWatt - b.actualWatt;
+    });
 
     // Default selection:
     // inverter with highest stock

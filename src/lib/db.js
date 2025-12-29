@@ -8,9 +8,16 @@ export async function connectDB() {
   }
 
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,
+      retryWrites: true,
+      maxPoolSize: 10,
+    });
     console.log("MongoDB Connected");
   } catch (error) {
     console.log("MongoDB Connection Error:", error);
+    throw error;
   }
 }
