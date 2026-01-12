@@ -64,31 +64,44 @@ const ApplianceTable = ({
   };
 
   // 🔹 Enable / Disable calculate button based on local appliances
+
   useEffect(() => {
-    const allowed = Object.values(appliances).some((items) =>
+    const applianceAllowed = Object.values(appliances).some((items) =>
       items.some((i) => i.qty > 0 && i.watts > 0)
     );
-    setIsCalculationAllowed(allowed);
-  }, [appliances]);
-  useEffect(() => {
-    const allowed = rows.some((r) => {
-      const watts = parseFloat(r.watts);
-      const qty = parseFloat(r.qty);
-      return r.name?.trim() && watts > 0 && qty >= 1;
+
+    const customAllowed = rows.some((r) => {
+      const watts = Number(r.watts);
+      const qty = Number(r.qty);
+      return r.type === "custom" && r.name?.trim() && watts > 0 && qty >= 1;
     });
-    setIsCalculationAllowed(allowed);
-  }, [rows]);
+
+    setIsCalculationAllowed(applianceAllowed || customAllowed);
+  }, [appliances, rows]);
 
   const handleCalculate = () => {
-    const totalLoad = Object.values(appliances)
+    // 🔹 Preset appliances total
+    const applianceTotal = Object.values(appliances)
       .flat()
       .reduce((sum, i) => sum + (i.total || 0), 0);
 
+    // 🔹 Custom loads total
+    const customTotal = rows
+      .filter((r) => r.type === "custom")
+      .reduce((sum, r) => {
+        const watts = Number(r.watts) || 0;
+        const qty = Number(r.qty) || 0;
+        return sum + watts * qty;
+      }, 0);
+
+    const totalLoad = applianceTotal + customTotal;
+
     if (totalLoad <= 0) return;
 
-    setShowPopup(true); // POPUP OPEN HOGA
+    setShowPopup(true);
     onCalculate?.(totalLoad);
   };
+
   const handleSystemSelect = (type) => {
     console.log("type", type);
     setShowPopup(false);

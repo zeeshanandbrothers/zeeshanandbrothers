@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -12,6 +13,7 @@ export default function ResetPasswordClient() {
 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,14 +48,27 @@ export default function ResetPasswordClient() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            placeholder="New password"
-            className="border p-2 w-full"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="border p-2 w-full flex items-center justify-between gap-1 ">
+            <input
+              type={isShowPassword ? "text" : "password"}
+              placeholder="New password"
+              className="w-full outline-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {isShowPassword ? (
+              <Eye
+                className="cursor-pointer"
+                onClick={() => setIsShowPassword(!isShowPassword)}
+              />
+            ) : (
+              <EyeOff
+                className="cursor-pointer"
+                onClick={() => setIsShowPassword(!isShowPassword)}
+              />
+            )}
+          </div>
 
           <button
             disabled={loading}

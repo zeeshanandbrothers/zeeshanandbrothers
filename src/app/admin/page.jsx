@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ProductListing() {
   const [products, setProducts] = useState([]);
@@ -17,8 +18,8 @@ export default function ProductListing() {
 
   async function fetchProducts(cat) {
     const res = await fetch(`/api/products?category=${cat}`);
-    const data = await res.json();
-    setProducts(data);
+    const productsdata = await res.json();
+    setProducts(productsdata);
   }
 
   async function handleUpdate(id, formData) {
@@ -27,14 +28,14 @@ export default function ProductListing() {
       body: formData,
     });
 
-    const data = await res.json();
+    const updatedData = await res.json();
 
-    if (data._id) {
-      alert("Updated successfully!");
+    if (updatedData._id) {
+      toast.success("Product Updated successfully!");
       fetchProducts(category);
       setEditProduct(null);
     } else {
-      alert("Update failed: " + (data.error || "Unknown error"));
+      toast.error("Update failed: " + (updatedData.error || "Unknown error"));
     }
   }
 

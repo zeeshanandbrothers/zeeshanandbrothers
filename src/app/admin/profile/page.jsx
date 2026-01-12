@@ -1,10 +1,10 @@
 "use client";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function AdminProfile() {
   const [admin, setAdmin] = useState(null);
-  console.log("admin", admin);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -42,6 +42,8 @@ export default function AdminProfile() {
 
 function EditProfileModal({ admin, close }) {
   const [loading, setLoading] = useState(false);
+  const [isShowOldPassword, setIsShowOldPassword] = useState(false);
+  const [isShowNewPassword, setIsShowNewPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -104,18 +106,46 @@ function EditProfileModal({ admin, close }) {
           />
 
           <label>Old Password</label>
-          <input
-            name="oldPassword"
-            type="password"
-            className="border p-2 w-full"
-          />
+          <div className="flex items-center justify-between gap-2 border p-2">
+            <input
+              name="oldPassword"
+              placeholder="Enter your old Password"
+              type={isShowOldPassword ? "text" : "password"}
+              className="outline-none w-full"
+            />
+            {isShowOldPassword ? (
+              <Eye
+                className="cursor-pointer"
+                onClick={() => setIsShowOldPassword(!isShowOldPassword)}
+              />
+            ) : (
+              <EyeOff
+                className="cursor-pointer"
+                onClick={() => setIsShowOldPassword(!isShowOldPassword)}
+              />
+            )}
+          </div>
 
           <label>New Password</label>
-          <input
-            name="newPassword"
-            type="password"
-            className="border p-2 w-full"
-          />
+          <div className="flex items-center justify-between gap-2 border p-2">
+            <input
+              name="newPassword"
+              placeholder="Enter New Password"
+              type={isShowNewPassword ? "text" : "password"}
+              className="outline-none w-full"
+            />
+            {isShowNewPassword ? (
+              <Eye
+                className="cursor-pointer"
+                onClick={() => setIsShowNewPassword(!isShowNewPassword)}
+              />
+            ) : (
+              <EyeOff
+                className="cursor-pointer"
+                onClick={() => setIsShowNewPassword(!isShowNewPassword)}
+              />
+            )}
+          </div>
 
           <button
             disabled={loading}

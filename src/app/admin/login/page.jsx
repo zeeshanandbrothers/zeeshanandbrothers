@@ -2,9 +2,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -61,13 +63,26 @@ export default function AdminLogin() {
 
           <div>
             <label className="text-gray-700 font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full mt-2 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter password"
-            />
+            <div className="flex items-center justify-between mt-2 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+              <input
+                type={isShowPassword ? "text" : "password"}
+                name="password"
+                required
+                className="w-full outline-none"
+                placeholder="Enter password"
+              />
+              {isShowPassword ? (
+                <Eye
+                  className="cursor-pointer"
+                  onClick={() => setIsShowPassword(!isShowPassword)}
+                />
+              ) : (
+                <EyeOff
+                  className="cursor-pointer"
+                  onClick={() => setIsShowPassword(!isShowPassword)}
+                />
+              )}
+            </div>
           </div>
           <p
             className="text-blue-500 text-right cursor-pointer"
@@ -79,7 +94,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
+            className="w-full cursor-pointer py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
