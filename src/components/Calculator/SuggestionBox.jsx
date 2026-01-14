@@ -27,6 +27,7 @@ const SuggestionBox = ({ calc, systemType }) => {
   const [loading, setLoading] = useState(false);
   const [selectedPanelId, setSelectedPanelId] = useState(null);
   const [selectedInverterId, setSelectedInverterId] = useState(null);
+  const [isFallback, setIsFallback] = useState(false);
 
   useEffect(() => {
     if (!calc?.totalWatts || !systemType) return;
@@ -171,6 +172,11 @@ ${
       </div>
     );
   }
+  const fallbackImages = {
+    panel: "/images/solar-fallback.png",
+    inverter: "/images/inverter-fallback.png",
+    battery: "/images/battery-fallback.png",
+  };
   return (
     <div className="rounded-lg border bg-card p-5 shadow-[0_0_15px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
@@ -207,9 +213,20 @@ ${
           </div>
           <div className="flex flex-col sm:flex-row gap-4 mt-2">
             <img
-              src={selectedPanel.image}
+              src={selectedPanel.image || "/images/solar-fallback.png"}
               alt={selectedPanel.name}
-              className="w-full h-full sm:w-24 sm:h-24 object-cover rounded"
+              className={`w-20 object-cover rounded ${
+                isFallback ? "h-30 w-25" : "h-20"
+              }`}
+              onError={(e) => {
+                setIsFallback(true);
+                e.currentTarget.src = "/images/solar-fallback.png";
+              }}
+              onLoad={(e) => {
+                if (e.currentTarget.src.includes("solar-fallback")) {
+                  setIsFallback(true);
+                }
+              }}
             />
             <div>
               <p className="font-semibold">{selectedPanel.name}</p>
@@ -305,9 +322,20 @@ ${
 
                   {/* 🖼 Image */}
                   <img
-                    src={inv.image}
+                    src={inv.image || "/images/inverter-fallback.png"}
                     alt={inv.name}
-                    className="w-20 h-20 object-cover rounded"
+                    className={`w-20 object-cover rounded ${
+                      isFallback ? "h-30 w-25" : "h-20"
+                    }`}
+                    onError={(e) => {
+                      setIsFallback(true);
+                      e.currentTarget.src = "/images/inverter-fallback.png";
+                    }}
+                    onLoad={(e) => {
+                      if (e.currentTarget.src.includes("inverter-fallback")) {
+                        setIsFallback(true);
+                      }
+                    }}
                   />
 
                   {/* 📄 Info */}

@@ -12,6 +12,10 @@ export default function ProductListing() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [originalValues, setOriginalValues] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
+  const [formData, setFormData] = useState({});
+
   useEffect(() => {
     fetchProducts(category);
   }, [category]);
@@ -48,6 +52,27 @@ export default function ProductListing() {
     if (data.success) fetchProducts(category);
   }
 
+  function handleChange(e) {
+    const { name, value, type, files } = e.target;
+
+    let newValue = value;
+
+    if (type === "file" && files?.[0]) {
+      newValue = "IMAGE_CHANGED"; // file compare trick
+    }
+
+    const updatedValues = {
+      ...originalValues,
+      [name]: newValue,
+    };
+
+    const hasChanged = Object.keys(originalValues).some(
+      (key) => String(originalValues[key]) !== String(updatedValues[key])
+    );
+
+    setIsDirty(hasChanged);
+  }
+
   // ----------- DYNAMIC COLUMNS BASED ON CATEGORY -----------
 
   const columns = {
@@ -74,6 +99,11 @@ export default function ProductListing() {
       "AH",
     ],
     accessory: ["Image", "Name", "Brand", "Price", "Stock"],
+  };
+  const fallbackImages = {
+    panel: "/images/solar-fallback.png",
+    inverter: "/images/inverter-fallback.png",
+    battery: "/images/battery-fallback.png",
   };
 
   return (
@@ -116,7 +146,14 @@ export default function ProductListing() {
               {products?.map((p) => (
                 <tr key={p._id} className="text-center border">
                   <td className="p-2 border">
-                    <img src={p.image} className="h-12 mx-auto" />
+                    <img
+                      src={p.image || fallbackImages[category]}
+                      onError={(e) => {
+                        e.currentTarget.src = fallbackImages[category];
+                      }}
+                      className="h-12 mx-auto"
+                      alt={p.name}
+                    />
                   </td>
 
                   <td className="p-2 border">{p.name}</td>
@@ -147,8 +184,22 @@ export default function ProductListing() {
                     <button
                       className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
                       onClick={() => {
-                        setImagePreview(p.image);
                         setEditProduct(p);
+                        setImagePreview(p.image);
+
+                        setOriginalValues({
+                          name: p.name ?? "",
+                          price: String(p.price ?? ""),
+                          stock: String(p.stock ?? ""),
+                          watt: String(p.watt ?? ""),
+                          actualWatt: String(p.actualWatt ?? ""),
+                          systemType: p.systemType ?? "",
+                          phase: p.phase ?? "",
+                          Ah: String(p.Ah ?? ""),
+                          image: p.image ?? "",
+                        });
+
+                        setIsDirty(false);
                       }}
                     >
                       Edit
@@ -245,6 +296,8 @@ export default function ProductListing() {
                 className="hidden"
                 disabled={isUpdating}
                 onChange={(e) => {
+                  handleChange(e);
+
                   const file = e.target.files[0];
                   if (file) {
                     const reader = new FileReader();
@@ -262,6 +315,7 @@ export default function ProductListing() {
                 defaultValue={editProduct.name}
                 className="border p-2 w-full"
                 disabled={isUpdating}
+                onChange={handleChange}
               />
 
               {/* PRICE */}
@@ -272,6 +326,7 @@ export default function ProductListing() {
                 defaultValue={editProduct.price}
                 className="border p-2 w-full"
                 disabled={isUpdating}
+                onChange={handleChange}
               />
 
               {/* STOCK */}
@@ -282,6 +337,7 @@ export default function ProductListing() {
                 defaultValue={editProduct.stock}
                 className="border p-2 w-full"
                 disabled={isUpdating}
+                onChange={handleChange}
               />
 
               {/* WATT + ACTUAL WATT */}
@@ -296,6 +352,7 @@ export default function ProductListing() {
                     defaultValue={editProduct.watt || ""}
                     className="border p-2 w-full"
                     disabled={isUpdating}
+                    onChange={handleChange}
                   />
 
                   <label className="block font-semibold">Actual Watt</label>
@@ -305,6 +362,7 @@ export default function ProductListing() {
                     defaultValue={editProduct.actualWatt || ""}
                     className="border p-2 w-full"
                     disabled={isUpdating}
+                    onChange={handleChange}
                   />
                 </>
               )}
@@ -318,6 +376,7 @@ export default function ProductListing() {
                     defaultValue={editProduct.systemType || ""}
                     className="border p-2 w-full"
                     disabled={isUpdating}
+                    onChange={handleChange}
                   >
                     <option value="">Select Type</option>
                     <option value="ongrid">OnGrid</option>
@@ -331,6 +390,7 @@ export default function ProductListing() {
                     defaultValue={editProduct.phase || ""}
                     className="border p-2 w-full"
                     disabled={isUpdating}
+                    onChange={handleChange}
                   >
                     <option value="">Select Phase</option>
                     <option value="single">Single</option>
@@ -349,6 +409,7 @@ export default function ProductListing() {
                     defaultValue={editProduct.Ah || ""}
                     className="border p-2 w-full"
                     disabled={isUpdating}
+                    onChange={handleChange}
                   />
                 </>
               )}
@@ -356,9 +417,9 @@ export default function ProductListing() {
               {/* BUTTON */}
               <button
                 type="submit"
-                disabled={isUpdating}
-                className={`w-full py-2 rounded mt-2 text-white ${
-                  isUpdating ? "bg-gray-400" : "bg-blue-600"
+                disabled={isUpdating || !isDirty}
+                className={`w-full py-2 rounded mt-2 text-white cursor-pointer ${
+                  isUpdating || !isDirty ? "bg-blue-200" : "bg-blue-600"
                 }`}
               >
                 {isUpdating ? "Updating..." : "Update"}
