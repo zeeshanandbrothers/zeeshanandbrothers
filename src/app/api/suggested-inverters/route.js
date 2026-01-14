@@ -285,8 +285,8 @@ export async function POST(req) {
       });
     }
 
-    // Client rule: actual watt + 12%
-    const TOLERANCE = 0.12;
+    // Client rule: actual watt + 10%
+    const TOLERANCE = 0.10;
 
     // Find the first inverter
     // whose (actualWatt + 12%) can handle the load
