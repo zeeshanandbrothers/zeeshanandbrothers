@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  BATTERIES_CATALOG,
-  INVERTERS_CATALOG,
-  PANELS_CATALOG,
-} from "@/data/ApplianceData";
+import { BATTERIES_CATALOG } from "@/data/ApplianceData";
 import { useEffect, useState } from "react";
 
-const SuggestionBox = ({ calc, systemType }) => {
-  const {
-    totalWatts,
-    inverterKVA,
-    batteryAh,
-    bestPanel,
-    bestBattery,
-    approxCostPKR,
-  } = calc;
+const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
+  const { totalWatts } = calc;
 
   const [selectedSystemType, setSelectedSystemType] = useState(
     systemType || "hybrid"
@@ -91,8 +80,6 @@ const SuggestionBox = ({ calc, systemType }) => {
   const batteryCatalog = BATTERIES_CATALOG[selectedSystemType] || [];
   const inverterCatalog = apiInverters;
 
-  // --- States for selected items ---
-
   // When systemType changes → reset selections
   useEffect(() => {
     // if (panelCatalog.length > 0) setSelectedPanelId(panelCatalog[0].id);
@@ -108,7 +95,6 @@ const SuggestionBox = ({ calc, systemType }) => {
   const selectedInverter = apiInverters.find(
     (inv) => inv._id === selectedInverterId
   );
-  console.log("actualWatt", selectedPanel?.actualWatt);
 
   useEffect(() => {
     const platesNeeded = selectedPanel?.actualWatt
@@ -118,9 +104,37 @@ const SuggestionBox = ({ calc, systemType }) => {
     setRequiredPanels(platesNeeded);
   }, [selectedPanelId, selectedPanel]);
 
-  const inverterNeeded = selectedInverter?.actualWatt
-    ? Math.ceil(totalWatts / selectedInverter.actualWatt)
-    : 1;
+  const handleBuyNow = () => {
+    if (!selectedInverterId) {
+      alert("Please select an inverter first");
+      return;
+    }
+
+    const orderSummary = {
+      systemType: selectedSystemType,
+      totalWatts,
+
+      panel: {
+        image: selectedPanel.image,
+        name: selectedPanel.name,
+        watt: selectedPanel.watt,
+        quantity: requiredPanels,
+        price: selectedPanel.price,
+        total: selectedPanel.price * requiredPanels,
+      },
+
+      inverter: {
+        image: selectedInverter.image,
+        name: selectedInverter.name,
+        watt: selectedInverter.watt,
+        quantity: selectedInverter.quantity,
+        price: selectedInverter.price,
+        total: selectedInverter.price * selectedInverter.quantity,
+      },
+    };
+
+    onBuyNow(orderSummary);
+  };
 
   if (!totalWatts || totalWatts <= 0)
     return (
@@ -129,33 +143,33 @@ const SuggestionBox = ({ calc, systemType }) => {
       </div>
     );
 
-  const whatsappMessage = `
-🌞 *Solar System Quotation Request* 🌞
+  //   const whatsappMessage = `
+  // 🌞 *Solar System Quotation Request* 🌞
 
-*System Type:* ${selectedSystemType.toUpperCase()}
-*Total Load:* ${totalWatts.toLocaleString()} W
-*Inverter Required:* ${inverterKVA} kVA
-*Battery Capacity:* ${batteryAh} Ah
+  // *System Type:* ${selectedSystemType.toUpperCase()}
+  // *Total Load:* ${totalWatts.toLocaleString()} W
+  // *Inverter Required:* ${inverterKVA} kVA
+  // *Battery Capacity:* ${batteryAh} Ah
 
-🔹 *Suggested Equipment:*
-• Panel: ${selectedPanel?.name} (${
-    selectedPanel?.watt
-  }W × ${requiredPanels} pcs)
-${
-  selectedSystemType !== "onGrid"
-    ? `• Battery: ${selectedBattery?.name} (${selectedBattery?.ah}Ah)`
-    : ""
-}
-• Inverter: ${selectedInverter?.name} (${selectedInverter?.kva}kVA)
+  // 🔹 *Suggested Equipment:*
+  // • Panel: ${selectedPanel?.name} (${
+  //     selectedPanel?.watt
+  //   }W × ${requiredPanels} pcs)
+  // ${
+  //   selectedSystemType !== "onGrid"
+  //     ? `• Battery: ${selectedBattery?.name} (${selectedBattery?.ah}Ah)`
+  //     : ""
+  // }
+  // • Inverter: ${selectedInverter?.name} (${selectedInverter?.kva}kVA)
 
-💰 *Estimated Total Cost:* PKR ${approxCostPKR.toLocaleString()}
-`.trim();
+  // 💰 *Estimated Total Cost:* PKR ${approxCostPKR.toLocaleString()}
+  // `.trim();
 
-  const WHATSAPP_NUMBER =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923001234567";
-  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    whatsappMessage
-  )}`;
+  //   const WHATSAPP_NUMBER =
+  //     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923001234567";
+  //   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  //     whatsappMessage
+  //   )}`;
 
   if (loading) {
     return (
@@ -172,11 +186,7 @@ ${
       </div>
     );
   }
-  const fallbackImages = {
-    panel: "/images/solar-fallback.png",
-    inverter: "/images/inverter-fallback.png",
-    battery: "/images/battery-fallback.png",
-  };
+
   return (
     <div className="rounded-lg border bg-card p-5 shadow-[0_0_15px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
@@ -189,8 +199,8 @@ ${
           onChange={(e) => setSelectedSystemType(e.target.value)}
         >
           <option value="hybrid">Hybrid System</option>
-          <option value="onGrid">On-Grid System</option>
-          <option value="offGrid">Off-Grid System</option>
+          <option value="ongrid">On-Grid System</option>
+          <option value="offgrid">Off-Grid System</option>
         </select>
       </div>
 
@@ -302,6 +312,7 @@ ${
           <div className="space-y-4">
             {apiInverters.map((inv, index) => {
               const isSelected = selectedInverterId === inv._id;
+              console.log("inv", inv);
 
               return (
                 <div
@@ -344,7 +355,8 @@ ${
                     <p className="text-sm text-muted-foreground">{inv.brand}</p>
 
                     <p className="mt-1">
-                      Capacity: {inv.watt / 1000}kW ({inv.actualWatt}W actual)
+                      Capacity: {inv.watt / 1000}kW
+                      {/* ({inv.actualWatt}W actual) */}
                     </p>
 
                     <p>
@@ -354,17 +366,11 @@ ${
                       </span>
                     </p>
 
-                    <p className="text-sm mt-1">
-                      You need{" "}
-                      <strong>{Math.ceil(totalWatts / inv.actualWatt)}</strong>{" "}
-                      inverter(s)
-                    </p>
-
-                    {/* {index === 0 && (
-                      <span className="inline-block mt-2 text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
-                        Recommended
-                      </span>
-                    )} */}
+                    {inv.quantity > 1 && (
+                      <p className="text-sm mt-1">
+                        You need <strong>{quantity}</strong> inverter(s)
+                      </p>
+                    )}
                   </div>
                 </div>
               );
@@ -377,18 +383,19 @@ ${
       <div className="flex flex-col md:flex-row gap-3 mt-4">
         <button
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md w-full"
-          onClick={() => alert("Redirect to Buy Now page (coming soon)")}
+          onClick={handleBuyNow}
         >
           Buy Now
         </button>
-        <a
+
+        {/* <a
           href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md w-full text-center"
         >
           WhatsApp Quotation
-        </a>
+        </a> */}
       </div>
     </div>
   );
