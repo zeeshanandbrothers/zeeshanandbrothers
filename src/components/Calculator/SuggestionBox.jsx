@@ -318,7 +318,7 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
                 <div
                   key={inv._id}
                   onClick={() => setSelectedInverterId(inv._id)}
-                  className={`cursor-pointer border rounded-md p-4 flex gap-4 items-start
+                  className={`cursor-pointer border rounded-md p-4 flex flex-col sm:flex-row gap-4 items-start
               ${isSelected ? "border-blue-600 bg-blue-50" : "border-gray-200"}
             `}
                 >
