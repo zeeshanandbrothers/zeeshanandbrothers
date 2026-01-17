@@ -7,12 +7,15 @@ import { useLoadCalculations } from "../hooks/useLoadCalculation";
 import ApplianceTable from "../components/Calculator/ApplianceTable";
 import SummaryCard from "../components/Calculator/SummaryCard";
 import SuggestionBox from "@/components/Calculator/SuggestionBox";
+import OrderSummaryModal from "@/components/Layout/OrderSummaryModal";
 
 const LoadCalculator = () => {
   const [rows, setRows] = useState(DEFAULT_ROWS);
   const [isCalculationAllowed, setIsCalculationAllowed] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [systemType, setSystemType] = useState(null); // NEW
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const [orderData, setOrderData] = useState(null);
 
   useEffect(() => {
     const allowed = rows.some((r) => {
@@ -213,9 +216,22 @@ const LoadCalculator = () => {
           <>
             <SummaryCard calc={calc} />
             {systemType && (
-              <SuggestionBox calc={calc} systemType={systemType} />
+              <SuggestionBox
+                calc={calc}
+                systemType={systemType}
+                onBuyNow={(data) => {
+                  setOrderData(data);
+                  setShowOrderSummary(true);
+                }}
+              />
             )}
           </>
+        )}
+        {showOrderSummary && (
+          <OrderSummaryModal
+            data={orderData}
+            onClose={() => setShowOrderSummary(false)}
+          />
         )}
       </div>
     </main>
