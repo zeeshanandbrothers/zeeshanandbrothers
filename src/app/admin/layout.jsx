@@ -38,7 +38,9 @@ export default function AdminLayout({ children }) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Products", href: "/admin" },
-    { icon: Package, label: "Add Products", href: "/admin/add-products" },
+    { icon: Package, label: "Add Product", href: "/admin/add-products" },
+    { icon: LayoutDashboard, label: "Projects", href: "/admin/projects" },
+    { icon: Package, label: "Add Project", href: "/admin/add-project" },
     { icon: Settings, label: "Profile", href: "/admin/profile" },
   ];
 

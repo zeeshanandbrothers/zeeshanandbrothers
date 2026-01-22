@@ -1,18 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import RevealOnScroll from "../Layout/Reveal_on_scroll";
-import { projects } from "../../data/projects";
 import ProjectCard from "../Projects/ProjectCard";
 import ProjectDialog from "../Projects/ProjectDialog";
 import { ArrowRight } from "lucide-react";
 
 const InstalledProjects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch("/api/projects");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setProjects(data);
+        }
+      } catch (error) {
+        console.error("Failed to load projects", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, []);
 
   // Show only first 3 featured projects
   const featuredProjects = projects.slice(0, 3);
+
+  if (loading) return <div className="py-24 text-center">Loading Projects...</div>;
 
   return (
     <section className="bg-muted/10 py-16 md:py-24">
@@ -42,7 +62,7 @@ const InstalledProjects = () => {
         {/* Projects Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.map((project, index) => (
-            <RevealOnScroll key={project.id} delay={index * 0.1}>
+            <RevealOnScroll key={project._id || project.id} delay={index * 0.1}>
               <ProjectCard
                 project={project}
                 onClick={() => setSelectedProject(project)}

@@ -1,13 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { projects } from "../../data/projects";
 import ProjectCard from "../../components/Projects/ProjectCard";
 import ProjectDialog from "../../components/Projects/ProjectDialog";
 
 export default function ProjectsPage() {
     const [selectedProject, setSelectedProject] = useState(null);
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const res = await fetch("/api/projects");
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setProjects(data);
+                }
+            } catch (error) {
+                console.error("Failed to load projects", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchProjects();
+    }, []);
+
+    if (loading) return <div className="text-center pt-32">Loading Projects...</div>;
 
     return (
         <main className="min-h-screen bg-background pb-20 pt-24 md:pt-32">
@@ -35,7 +55,7 @@ export default function ProjectsPage() {
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {projects.map((project, index) => (
                         <motion.div
-                            key={project.id}
+                            key={project._id || project.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
