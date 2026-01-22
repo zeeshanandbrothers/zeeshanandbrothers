@@ -48,7 +48,7 @@ export default function AdminProjects() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading projects...</div>;
+    if (loading) return <div className="min-h-screen bg-gray-50 p-8 text-center">Loading projects...</div>;
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">

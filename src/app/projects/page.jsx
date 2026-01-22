@@ -27,7 +27,7 @@ export default function ProjectsPage() {
         fetchProjects();
     }, []);
 
-    if (loading) return <div className="text-center pt-32">Loading Projects...</div>;
+    if (loading) return <div className="min-h-screen bg-background p-6 text-center pt-32">Loading Projects...</div>;
 
     return (
         <main className="min-h-screen bg-background pb-20 pt-24 md:pt-32">
