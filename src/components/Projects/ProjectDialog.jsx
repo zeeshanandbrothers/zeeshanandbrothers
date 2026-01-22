@@ -193,7 +193,7 @@ const InfoRow = ({ icon, label, value }) => (
         <div className="flex-shrink-0 text-primary">{icon}</div>
         <div className="flex-1">
             <span className="mr-2 font-medium text-foreground">{label}:</span>
-            {value}
+            {value || "N/A"}
         </div>
     </div>
 );

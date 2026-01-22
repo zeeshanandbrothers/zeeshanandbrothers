@@ -3,6 +3,23 @@ import { connectDB } from "@/lib/db";
 import cloudinary from "@/lib/cloudinary";
 import Project from "@/models/Project";
 
+// Helper to upload buffer to Cloudinary using stream
+const uploadToCloudinary = (file, folder) => {
+    return new Promise(async (resolve, reject) => {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        cloudinary.uploader.upload_stream(
+            { folder },
+            (error, result) => {
+                if (error) {
+                    console.error("Cloudinary upload error:", error);
+                    return reject(error);
+                }
+                resolve(result);
+            }
+        ).end(buffer);
+    });
+};
+
 export async function POST(request) {
     try {
         await connectDB();
@@ -15,7 +32,7 @@ export async function POST(request) {
         const shortDescription = formData.get("shortDescription");
         const fullDescription = formData.get("fullDescription");
 
-        // System Info (Handling it as individual fields or a JSON string if sent that way, but assuming form fields for simplicity)
+        // System Info
         const inverter = formData.get("inverter");
         const batteries = formData.get("batteries");
         const panels = formData.get("panels");
@@ -27,27 +44,21 @@ export async function POST(request) {
 
         // 1. Upload Cover Image
         let coverImageUrl = "";
-        if (coverImageFile) {
-            const buffer = Buffer.from(await coverImageFile.arrayBuffer());
-            const base64 = `data:${coverImageFile.type};base64,${buffer.toString("base64")}`;
-            const upload = await cloudinary.uploader.upload(base64, {
-                folder: "projects/covers",
-            });
+        if (coverImageFile && typeof coverImageFile === 'object' && coverImageFile.size > 0) {
+            const upload = await uploadToCloudinary(coverImageFile, "projects/covers");
             coverImageUrl = upload.secure_url;
         }
 
         // 2. Upload Gallery Images
         let galleryImageUrls = [];
         if (galleryImageFiles && galleryImageFiles.length > 0) {
-            const uploadPromises = galleryImageFiles.map(async (file) => {
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
-                return cloudinary.uploader.upload(base64, {
-                    folder: "projects/gallery",
-                });
-            });
-            const uploads = await Promise.all(uploadPromises);
-            galleryImageUrls = uploads.map(upload => upload.secure_url);
+             const validFiles = galleryImageFiles.filter(f => typeof f === 'object' && f.size > 0);
+             if (validFiles.length > 0) {
+                 const uploads = await Promise.all(
+                     validFiles.map(file => uploadToCloudinary(file, "projects/gallery"))
+                 );
+                 galleryImageUrls = uploads.map(upload => upload.secure_url);
+             }
         }
 
         const newProject = await Project.create({
@@ -68,7 +79,7 @@ export async function POST(request) {
 
         return NextResponse.json({ success: true, project: newProject });
     } catch (error) {
-        console.log(error);
+        console.error("Create Project Error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

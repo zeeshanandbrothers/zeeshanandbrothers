@@ -53,16 +53,16 @@ const Header = () => {
               Calculator
             </Link>
           </li>
+          <li>
+            <Link className="text-sm hover:underline" href="/projects">
+              Projects
+            </Link>
+          </li>
           {/* <li>
             <Link className="text-sm hover:underline" href="/products">
               Products
             </Link>
-          </li>
-          <li>
-            <Link className="text-sm hover:underline" href="/reviews">
-              Reviews
-            </Link>
-          </li> */}
+          </li>*/}
           <li>
             <Link
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=I%20want%20a%20solar%20quotation`}

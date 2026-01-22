@@ -1,11 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function EditProject({ params }) {
     const router = useRouter();
-    const { id } = params;
+    const { id } = use(params);
 
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);

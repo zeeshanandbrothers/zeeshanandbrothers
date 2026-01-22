@@ -7,7 +7,7 @@ import cloudinary from "@/lib/cloudinary";
 export async function GET(request, { params }) {
     try {
         await connectDB();
-        const { id } = params;
+        const { id } = await params;
         const project = await Project.findById(id);
         if (!project) {
             return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -21,7 +21,7 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
     try {
         await connectDB();
-        const { id } = params;
+        const { id } = await params;
         const formData = await request.formData();
 
         const title = formData.get("title");
@@ -103,8 +103,8 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
     try {
         await connectDB();
-        const { id } = params;
-        await Project.findByIdAndDelete(id);
+        const { id } = await params;
+        const project = await Project.findByIdAndDelete(id);
         return NextResponse.json({ success: true, message: "Project deleted successfully" });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
