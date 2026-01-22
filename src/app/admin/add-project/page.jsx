@@ -20,12 +20,43 @@ export default function AddProject() {
 
     const handleGalleryChange = (e) => {
         const files = Array.from(e.target.files || []);
+        
+        if (files.length > 4) {
+            toast.error("You can maintain maximum 4 images in gallery");
+            // Clear the input
+            e.target.value = "";
+            return;
+        }
+
+        if (files.length + galleryPreviews.length > 4) { // Though here previews are replaced or appended? 
+             // The original code appended: setGalleryPreviews(prev => [...prev, reader.result]);
+             // But the input onChange handles *new* files.
+             // If we want total max 4, we should check against current state.
+             // However, for a file input "multiple", it usually replaces the selection if clicked again, 
+             // but here the user might be adding incrementally if they customized it (the UI shows "+ Add Images").
+             // Let's check the UI logic. 
+             // Logic: files.forEach... setGalleryPreviews(prev => [...prev, ...])
+             // So it is incremental.
+        }
+
+        // Correct check including existing previews
+        if (galleryPreviews.length + files.length > 4) {
+             toast.error("You can maintain maximum 4 images in gallery");
+             e.target.value = ""; // Clear current selection
+             return;
+        }
+
         const newPreviews = [];
 
         files.forEach(file => {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setGalleryPreviews(prev => [...prev, reader.result]);
+                setGalleryPreviews(prev => {
+                    const updated = [...prev, reader.result];
+                    // Double check in setter just in case of race conditions, though rare here
+                    if (updated.length > 4) return prev; 
+                    return updated;
+                });
             };
             reader.readAsDataURL(file);
         });

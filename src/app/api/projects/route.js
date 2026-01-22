@@ -42,6 +42,10 @@ export async function POST(request) {
         const coverImageFile = formData.get("coverImage");
         const galleryImageFiles = formData.getAll("galleryImages");
 
+        if (galleryImageFiles.length > 4) {
+            return NextResponse.json({ error: "Maximum 4 gallery images allowed" }, { status: 400 });
+        }
+
         // 1. Upload Cover Image
         let coverImageUrl = "";
         if (coverImageFile && typeof coverImageFile === 'object' && coverImageFile.size > 0) {

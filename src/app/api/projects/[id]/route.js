@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Project from "@/models/Project";
 
-import cloudinary from "@/lib/cloudinary";
+import cloudinary, { deleteFromCloudinary } from "@/lib/cloudinary";
 
 export async function GET(request, { params }) {
     try {
@@ -40,9 +40,28 @@ export async function PUT(request, { params }) {
         const galleryImageFiles = formData.getAll("galleryImages"); // New files
         const existingGalleryImages = formData.getAll("existingGalleryImages"); // Existing URLs kept
 
-        // 1. Upload Cover Image if provided
+        // 1. Validate Image Count
+        const totalImages = (existingGalleryImages ? existingGalleryImages.length : 0) + 
+                          (galleryImageFiles ? galleryImageFiles.length : 0);
+
+        if (totalImages > 4) {
+            return NextResponse.json({ error: "Maximum 4 gallery images allowed" }, { status: 400 });
+        }
+
+        // Fetch current project to handle deletions
+        const currentProject = await Project.findById(id);
+        if (!currentProject) {
+            return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        }
+
+        // 2. Upload Cover Image if provided
         let coverImageUrl = formData.get("existingCoverImage"); // Default to existing
         if (coverImageFile && typeof coverImageFile === 'object') {
+            // Delete old cover if exists
+            if (currentProject.coverImage) {
+                await deleteFromCloudinary(currentProject.coverImage);
+            }
+
             const buffer = Buffer.from(await coverImageFile.arrayBuffer());
             const base64 = `data:${coverImageFile.type};base64,${buffer.toString("base64")}`;
             const upload = await cloudinary.uploader.upload(base64, {
@@ -71,6 +90,17 @@ export async function PUT(request, { params }) {
         // Combine existing (that were not removed) and new images
         // Note: The frontend should send 'existingGalleryImages' for *every* image that is kept.
         const updatedGallery = [...(existingGalleryImages || []), ...newGalleryImageUrls];
+
+        // Identify removed images and delete them from Cloudinary
+        const currentGallery = currentProject.galleryImages || [];
+        const keptImages = existingGalleryImages || [];
+        
+        // Find images that are in currentGallery but NOT in keptImages
+        const imagesToDelete = currentGallery.filter(url => !keptImages.includes(url));
+
+        if (imagesToDelete.length > 0) {
+            await Promise.all(imagesToDelete.map(url => deleteFromCloudinary(url)));
+        }
 
         const updatedProject = await Project.findByIdAndUpdate(
             id,
@@ -104,7 +134,20 @@ export async function DELETE(request, { params }) {
     try {
         await connectDB();
         const { id } = await params;
-        const project = await Project.findByIdAndDelete(id);
+        const project = await Project.findById(id);
+        if (!project) {
+             return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        }
+
+        // Delete images from Cloudinary
+        if (project.coverImage) {
+            await deleteFromCloudinary(project.coverImage);
+        }
+        if (project.galleryImages && project.galleryImages.length > 0) {
+            await Promise.all(project.galleryImages.map(url => deleteFromCloudinary(url)));
+        }
+
+        await Project.findByIdAndDelete(id);
         return NextResponse.json({ success: true, message: "Project deleted successfully" });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

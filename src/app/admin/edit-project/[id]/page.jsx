@@ -92,6 +92,12 @@ export default function EditProject({ params }) {
     const handleGalleryChange = (e) => {
         const files = Array.from(e.target.files || []);
 
+        if (galleryPreviews.length + files.length > 4) {
+             toast.error("You can maintain maximum 4 images in gallery");
+             e.target.value = ""; 
+             return;
+        }
+
         files.forEach(file => {
             const reader = new FileReader();
             reader.onloadend = () => {
