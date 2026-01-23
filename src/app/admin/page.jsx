@@ -67,7 +67,7 @@ export default function ProductListing() {
     };
 
     const hasChanged = Object.keys(originalValues).some(
-      (key) => String(originalValues[key]) !== String(updatedValues[key])
+      (key) => String(originalValues[key]) !== String(updatedValues[key]),
     );
 
     setIsDirty(hasChanged);
@@ -110,10 +110,14 @@ export default function ProductListing() {
     <div className="p-6">
       {/* CATEGORY DROPDOWN */}
       <div className="mb-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Products</h1>
-
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Products
+          </h1>
+          <p className="text-gray-600 mt-1">Manage your products.</p>
+        </div>
         <select
-          className="border px-3 py-2 rounded bg-white shadow"
+          className="border px-3 py-2 rounded-lg bg-white shadow"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
@@ -130,95 +134,102 @@ export default function ProductListing() {
             No products found in <strong>{category}</strong> category.
           </div>
         ) : (
-          <table className="w-full border">
-            <thead className="bg-gray-100">
-              <tr>
-                {columns[category].map((col, i) => (
-                  <th key={i} className="p-2 border">
-                    {col}
+          <div className="bg-white rounded-lg shadow overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-100 border">
+                  {columns[category].map((col, i) => (
+                    <th
+                      key={i}
+                      className="p-4 pl-2 border font-semibold text-gray-600"
+                    >
+                      {col}
+                    </th>
+                  ))}
+                  <th className="p-4 pl-2 font-semibold text-gray-600">
+                    Actions
                   </th>
-                ))}
-                <th className="p-2 border">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {products?.map((p) => (
-                <tr key={p._id} className="text-center border">
-                  <td className="p-2 border">
-                    <img
-                      src={p.image || fallbackImages[category]}
-                      onError={(e) => {
-                        e.currentTarget.src = fallbackImages[category];
-                      }}
-                      className="h-12 mx-auto"
-                      alt={p.name}
-                    />
-                  </td>
-
-                  <td className="p-2 border">{p.name}</td>
-                  <td className="p-2 border">{p.brand}</td>
-                  <td className="p-2 border">{p.price}</td>
-                  <td className="p-2 border">{p.stock}</td>
-
-                  {category !== "accessory" && (
-                    <>
-                      <td className="p-2 border">{p.watt}</td>
-                      <td className="p-2 border">{p.actualWatt}</td>
-                    </>
-                  )}
-
-                  {category === "inverter" && (
-                    <>
-                      <td className="p-2 border">{p.systemType}</td>
-                      <td className="p-2 border">{p.phase}</td>
-                    </>
-                  )}
-
-                  {category === "battery" && (
-                    <td className="p-2 border">{p.Ah}</td>
-                  )}
-
-                  {/* ACTIONS */}
-                  <td className="p-2 border flex flex-col gap-2">
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
-                      onClick={() => {
-                        setEditProduct(p);
-                        setImagePreview(p.image);
-
-                        setOriginalValues({
-                          name: p.name ?? "",
-                          price: String(p.price ?? ""),
-                          stock: String(p.stock ?? ""),
-                          watt: String(p.watt ?? ""),
-                          actualWatt: String(p.actualWatt ?? ""),
-                          systemType: p.systemType ?? "",
-                          phase: p.phase ?? "",
-                          Ah: String(p.Ah ?? ""),
-                          image: p.image ?? "",
-                        });
-
-                        setIsDirty(false);
-                      }}
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
-                      onClick={() => {
-                        setDeleteId(p._id);
-                        setShowDeleteModal(true);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {products?.map((p) => (
+                  <tr key={p._id} className="text-left border hover:bg-gray-50">
+                    <td className="p-2 border">
+                      <img
+                        src={p.image || fallbackImages[category]}
+                        onError={(e) => {
+                          e.currentTarget.src = fallbackImages[category];
+                        }}
+                        className="w-16 h-12 object-cover rounded "
+                        alt={p.name}
+                      />
+                    </td>
+
+                    <td className="p-2 border">{p.name}</td>
+                    <td className="p-2 border">{p.brand}</td>
+                    <td className="p-2 border">{p.price}</td>
+                    <td className="p-2 border">{p.stock}</td>
+
+                    {category !== "accessory" && (
+                      <>
+                        <td className="p-2 border">{p.watt}</td>
+                        <td className="p-2 border">{p.actualWatt}</td>
+                      </>
+                    )}
+
+                    {category === "inverter" && (
+                      <>
+                        <td className="p-2 border">{p.systemType}</td>
+                        <td className="p-2 border">{p.phase}</td>
+                      </>
+                    )}
+
+                    {category === "battery" && (
+                      <td className="p-2 border">{p.Ah}</td>
+                    )}
+
+                    {/* ACTIONS */}
+                    <td className="p-2 border flex flex-col gap-2">
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
+                        onClick={() => {
+                          setEditProduct(p);
+                          setImagePreview(p.image);
+
+                          setOriginalValues({
+                            name: p.name ?? "",
+                            price: String(p.price ?? ""),
+                            stock: String(p.stock ?? ""),
+                            watt: String(p.watt ?? ""),
+                            actualWatt: String(p.actualWatt ?? ""),
+                            systemType: p.systemType ?? "",
+                            phase: p.phase ?? "",
+                            Ah: String(p.Ah ?? ""),
+                            image: p.image ?? "",
+                          });
+
+                          setIsDirty(false);
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
+                        onClick={() => {
+                          setDeleteId(p._id);
+                          setShowDeleteModal(true);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

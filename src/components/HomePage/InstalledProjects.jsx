@@ -25,17 +25,18 @@ const InstalledProjects = () => {
       } finally {
         setLoading(false);
       }
-    }
+    };
     fetchProjects();
   }, []);
 
   // Show only first 3 featured projects
   const featuredProjects = projects.slice(0, 3);
 
-  if (loading) return <div className="py-24 text-center">Loading Projects...</div>;
+  if (loading)
+    return <div className="py-24 text-center">Loading Projects...</div>;
 
   return (
-    <section className="bg-muted/10 py-16 md:py-24">
+    <section className="bg-muted/10 py-12 md:py-16">
       <div className="mx-auto max-w-6xl px-4">
         {/* Header */}
         <div className="mb-12 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
@@ -44,7 +45,8 @@ const InstalledProjects = () => {
               Installed Projects
             </h2>
             <p className="mt-4 max-w-xl text-lg text-muted-foreground">
-              Explore our portfolio of premium solar installations across residential and commercial sectors.
+              Explore our portfolio of premium solar installations across
+              residential and commercial sectors.
             </p>
           </RevealOnScroll>
 

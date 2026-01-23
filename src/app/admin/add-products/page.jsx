@@ -41,7 +41,7 @@ export default function AddProduct() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen p-6">
       <div className=" mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
@@ -55,6 +55,9 @@ export default function AddProduct() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Product Image
+              </label>
               <div className="flex items-center gap-4">
                 <label htmlFor="imageInput" className="cursor-pointer">
                   {imagePreview ? (
@@ -66,9 +69,13 @@ export default function AddProduct() {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center gap-5">
-                      <img src="/images/upload_area.png" alt="" />
-                      <p className="text-gray-600 font-semibold text-md max-w-[140px]">
+                    <div className="flex items-center gap-5 border-2 border-dashed border-gray-300 p-4 rounded-lg">
+                      <img
+                        src="/images/upload_area.png"
+                        alt=""
+                        className="w-10 h-10 opacity-50"
+                      />
+                      <p className="text-gray-600 font-semibold text-md">
                         Upload product picture
                       </p>
                     </div>
