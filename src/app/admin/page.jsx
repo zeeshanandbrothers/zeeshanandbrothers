@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Search } from "lucide-react";
+import Loader from "@/components/ui/Loader";
+import { useEffect, useState } from "react";
 
 export default function ProductListing() {
   const [products, setProducts] = useState([]);
@@ -15,15 +17,25 @@ export default function ProductListing() {
   const [originalValues, setOriginalValues] = useState({});
   const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchProducts(category);
   }, [category]);
 
   async function fetchProducts(cat) {
-    const res = await fetch(`/api/products?category=${cat}`);
-    const productsdata = await res.json();
-    setProducts(productsdata);
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/products?category=${cat}`);
+      const productsdata = await res.json();
+      setProducts(productsdata);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch products");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleUpdate(id, formData) {
@@ -109,29 +121,47 @@ export default function ProductListing() {
   return (
     <div className="p-6">
       {/* CATEGORY DROPDOWN */}
-      <div className="mb-4 flex justify-between items-center">
+      <div className="mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Products
           </h1>
           <p className="text-gray-600 mt-1">Manage your products.</p>
         </div>
-        <select
-          className="border px-3 py-2 rounded-lg bg-white shadow"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="panel">Solar Panel</option>
-          <option value="inverter">Inverter</option>
-          <option value="battery">Battery</option>
-          <option value="accessory">Accessory</option>
-        </select>
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="pl-10 pr-4 py-2 w-full border rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <select
+            className="border px-3 py-2 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="panel">Solar Panel</option>
+            <option value="inverter">Inverter</option>
+            <option value="battery">Battery</option>
+            <option value="accessory">Accessory</option>
+          </select>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
-        {products.length === 0 ? (
+        {loading ? (
+          <Loader text="Loading products..." />
+        ) : products.length === 0 ? (
           <div className="p-6 text-center text-gray-500">
             No products found in <strong>{category}</strong> category.
+          </div>
+        ) : products.filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+          <div className="p-6 text-center text-gray-500">
+            No products matching "{searchTerm}" found.
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -153,80 +183,84 @@ export default function ProductListing() {
               </thead>
 
               <tbody>
-                {products?.map((p) => (
-                  <tr key={p._id} className="text-left border hover:bg-gray-50">
-                    <td className="p-2 border">
-                      <img
-                        src={p.image || fallbackImages[category]}
-                        onError={(e) => {
-                          e.currentTarget.src = fallbackImages[category];
-                        }}
-                        className="w-16 h-12 object-cover rounded "
-                        alt={p.name}
-                      />
-                    </td>
+                {products
+                  ?.filter((p) =>
+                    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((p) => (
+                    <tr key={p._id} className="text-left border hover:bg-gray-50">
+                      <td className="p-2 border">
+                        <img
+                          src={p.image || fallbackImages[category]}
+                          onError={(e) => {
+                            e.currentTarget.src = fallbackImages[category];
+                          }}
+                          className="w-16 h-12 object-cover rounded "
+                          alt={p.name}
+                        />
+                      </td>
 
-                    <td className="p-2 border">{p.name}</td>
-                    <td className="p-2 border">{p.brand}</td>
-                    <td className="p-2 border">{p.price}</td>
-                    <td className="p-2 border">{p.stock}</td>
+                      <td className="p-2 border">{p.name}</td>
+                      <td className="p-2 border">{p.brand}</td>
+                      <td className="p-2 border">{p.price}</td>
+                      <td className="p-2 border">{p.stock}</td>
 
-                    {category !== "accessory" && (
-                      <>
-                        <td className="p-2 border">{p.watt}</td>
-                        <td className="p-2 border">{p.actualWatt}</td>
-                      </>
-                    )}
+                      {category !== "accessory" && (
+                        <>
+                          <td className="p-2 border">{p.watt}</td>
+                          <td className="p-2 border">{p.actualWatt}</td>
+                        </>
+                      )}
 
-                    {category === "inverter" && (
-                      <>
-                        <td className="p-2 border">{p.systemType}</td>
-                        <td className="p-2 border">{p.phase}</td>
-                      </>
-                    )}
+                      {category === "inverter" && (
+                        <>
+                          <td className="p-2 border">{p.systemType}</td>
+                          <td className="p-2 border">{p.phase}</td>
+                        </>
+                      )}
 
-                    {category === "battery" && (
-                      <td className="p-2 border">{p.Ah}</td>
-                    )}
+                      {category === "battery" && (
+                        <td className="p-2 border">{p.Ah}</td>
+                      )}
 
-                    {/* ACTIONS */}
-                    <td className="p-2 border flex flex-col gap-2">
-                      <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
-                        onClick={() => {
-                          setEditProduct(p);
-                          setImagePreview(p.image);
+                      {/* ACTIONS */}
+                      <td className="p-2 border flex flex-col gap-2">
+                        <button
+                          className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
+                          onClick={() => {
+                            setEditProduct(p);
+                            setImagePreview(p.image);
 
-                          setOriginalValues({
-                            name: p.name ?? "",
-                            price: String(p.price ?? ""),
-                            stock: String(p.stock ?? ""),
-                            watt: String(p.watt ?? ""),
-                            actualWatt: String(p.actualWatt ?? ""),
-                            systemType: p.systemType ?? "",
-                            phase: p.phase ?? "",
-                            Ah: String(p.Ah ?? ""),
-                            image: p.image ?? "",
-                          });
+                            setOriginalValues({
+                              name: p.name ?? "",
+                              price: String(p.price ?? ""),
+                              stock: String(p.stock ?? ""),
+                              watt: String(p.watt ?? ""),
+                              actualWatt: String(p.actualWatt ?? ""),
+                              systemType: p.systemType ?? "",
+                              phase: p.phase ?? "",
+                              Ah: String(p.Ah ?? ""),
+                              image: p.image ?? "",
+                            });
 
-                          setIsDirty(false);
-                        }}
-                      >
-                        Edit
-                      </button>
+                            setIsDirty(false);
+                          }}
+                        >
+                          Edit
+                        </button>
 
-                      <button
-                        className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
-                        onClick={() => {
-                          setDeleteId(p._id);
-                          setShowDeleteModal(true);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <button
+                          className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
+                          onClick={() => {
+                            setDeleteId(p._id);
+                            setShowDeleteModal(true);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -355,28 +389,28 @@ export default function ProductListing() {
               {(editProduct.category === "panel" ||
                 editProduct.category === "inverter" ||
                 editProduct.category === "battery") && (
-                <>
-                  <label className="block font-semibold">Watt</label>
-                  <input
-                    type="number"
-                    name="watt"
-                    defaultValue={editProduct.watt || ""}
-                    className="border p-2 w-full"
-                    disabled={isUpdating}
-                    onChange={handleChange}
-                  />
+                  <>
+                    <label className="block font-semibold">Watt</label>
+                    <input
+                      type="number"
+                      name="watt"
+                      defaultValue={editProduct.watt || ""}
+                      className="border p-2 w-full"
+                      disabled={isUpdating}
+                      onChange={handleChange}
+                    />
 
-                  <label className="block font-semibold">Actual Watt</label>
-                  <input
-                    type="number"
-                    name="actualWatt"
-                    defaultValue={editProduct.actualWatt || ""}
-                    className="border p-2 w-full"
-                    disabled={isUpdating}
-                    onChange={handleChange}
-                  />
-                </>
-              )}
+                    <label className="block font-semibold">Actual Watt</label>
+                    <input
+                      type="number"
+                      name="actualWatt"
+                      defaultValue={editProduct.actualWatt || ""}
+                      className="border p-2 w-full"
+                      disabled={isUpdating}
+                      onChange={handleChange}
+                    />
+                  </>
+                )}
 
               {/* INVERTER FIELDS */}
               {editProduct.category === "inverter" && (
@@ -429,9 +463,8 @@ export default function ProductListing() {
               <button
                 type="submit"
                 disabled={isUpdating || !isDirty}
-                className={`w-full py-2 rounded mt-2 text-white cursor-pointer ${
-                  isUpdating || !isDirty ? "bg-blue-200" : "bg-blue-600"
-                }`}
+                className={`w-full py-2 rounded mt-2 text-white cursor-pointer ${isUpdating || !isDirty ? "bg-blue-200" : "bg-blue-600"
+                  }`}
               >
                 {isUpdating ? "Updating..." : "Update"}
               </button>

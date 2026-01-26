@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import ProductCard from "@/components/Products/ProductCard";
 import ProductDialog from "@/components/Products/ProductDialog";
 import { Filter } from "lucide-react";
@@ -42,21 +43,28 @@ const ProductsPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-background py-12 md:py-20">
+        <div className="min-h-screen bg-background py-12 md:py-16">
             <div className="mx-auto max-w-7xl px-4">
                 {/* Page Header */}
                 <div className="mb-12 text-center">
-                    <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }} className="mb-4 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
                         Our Products
-                    </h1>
-                    <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }} className="mx-auto max-w-2xl text-lg text-muted-foreground">
                         Explore our complete range of premium solar energy products.
                         Quality components for your solar installation needs.
-                    </p>
+                    </motion.p>
                 </div>
 
                 {/* Category Filter */}
-                <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+                <motion.div initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-wrap items-center justify-center gap-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <Filter className="h-4 w-4" />
                         <span>Filter:</span>
@@ -66,14 +74,14 @@ const ProductsPage = () => {
                             key={category.id}
                             onClick={() => setSelectedCategory(category.id)}
                             className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${selectedCategory === category.id
-                                    ? "bg-primary text-primary-foreground shadow-md"
-                                    : "border border-border bg-card text-foreground hover:border-primary hover:text-primary"
+                                ? "bg-primary text-primary-foreground shadow-md"
+                                : "border border-border bg-card text-foreground hover:border-primary hover:text-primary"
                                 }`}
                         >
                             {category.label}
                         </button>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Loading State */}
                 {loading && (
@@ -119,7 +127,7 @@ const ProductsPage = () => {
                 isOpen={!!selectedProduct}
                 onClose={() => setSelectedProduct(null)}
             />
-        </div>
+        </div >
     );
 };
 

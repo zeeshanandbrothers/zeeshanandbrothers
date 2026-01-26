@@ -40,6 +40,28 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
         return categories[category] || category;
     };
 
+    const getProductImage = (product) => {
+        const image = product.image;
+
+        const isValidUrl =
+            typeof image === "string" &&
+            (image.startsWith("http://") || image.startsWith("https://")) &&
+            !image.includes("res.cloudinary.com/xxx");
+
+        if (isValidUrl) {
+            return image;
+        }
+
+        const fallbackMap = {
+            panel: "/images/solar-fallback.png",
+            battery: "/images/battery-fallback.png",
+            inverter: "/images/inverter-fallback.png",
+        };
+
+        return fallbackMap[product.category] || "/images/solar-fallback.png";
+    };
+
+
     const isInStock = product.stock > 0;
 
     return (
@@ -79,10 +101,10 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
                                         {/* Main Image */}
                                         <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-md">
                                             <Image
-                                                src={product.image}
+                                                src={getProductImage(product)}
                                                 alt={product.name}
                                                 fill
-                                                className="object-cover transition-all duration-300"
+                                                className="object-cover transition-transform duration-500 group-hover:scale-105"
                                             />
                                         </div>
 

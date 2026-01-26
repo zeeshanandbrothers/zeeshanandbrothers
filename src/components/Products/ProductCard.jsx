@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowRight, Package } from "lucide-react";
 
 const ProductCard = ({ product, onClick }) => {
+  console.log("product", product);
   // Format price to currency
   const formatPrice = (price) => {
     return new Intl.NumberFormat("en-PK", {
@@ -25,6 +26,28 @@ const ProductCard = ({ product, onClick }) => {
     return categories[category] || category;
   };
 
+  const getProductImage = (product) => {
+    const image = product.image;
+
+    const isValidUrl =
+      typeof image === "string" &&
+      (image.startsWith("http://") || image.startsWith("https://")) &&
+      !image.includes("res.cloudinary.com/xxx");
+
+    if (isValidUrl) {
+      return image;
+    }
+
+    const fallbackMap = {
+      panel: "/images/solar-fallback.png",
+      battery: "/images/battery-fallback.png",
+      inverter: "/images/inverter-fallback.png",
+    };
+
+    return fallbackMap[product.category] || "/images/solar-fallback.png";
+  };
+
+
   // Check stock status
   const isInStock = product.stock > 0;
 
@@ -39,13 +62,14 @@ const ProductCard = ({ product, onClick }) => {
       onClick={onClick}
     >
       {/* Image Container */}
-      <div className="relative aspect-square w-full overflow-hidden bg-muted/20">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted/20">
         <Image
-          src={product.image}
+          src={getProductImage(product)}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-40" />
 
         {/* Category Badge */}

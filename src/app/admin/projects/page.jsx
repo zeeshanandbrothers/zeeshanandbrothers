@@ -2,14 +2,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { Trash2, Plus, Eye } from "lucide-react";
+import { Trash2, Plus, Eye, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Loader from "@/components/ui/Loader";
 
 export default function AdminProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -53,20 +55,32 @@ export default function AdminProjects() {
   return (
     <div className="min-h-screen p-6">
       <div className="mx-auto max-w-6xl">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
               Projects
             </h1>
             <p className="text-gray-600 mt-1">Manage your installed projects</p>
           </div>
-          <Link
-            href="/admin/add-project"
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            <Plus className="w-5 h-5" />
-            Add Project
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                className="pl-10 pr-4 py-2 w-full border rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Link
+              href="/admin/add-project"
+              className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-sm whitespace-nowrap"
+            >
+              <Plus className="w-5 h-5" />
+              Add Project
+            </Link>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow overflow-x-auto">
@@ -93,45 +107,55 @@ export default function AdminProjects() {
                     No projects found.
                   </td>
                 </tr>
+              ) : projects.filter((p) => p.title.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="p-8 text-center text-gray-500">
+                    No projects matching "{searchTerm}" found.
+                  </td>
+                </tr>
               ) : (
-                projects.map((project) => (
-                  <tr key={project._id} className="border hover:bg-gray-50">
-                    <td className="p-2 border">
-                      <img
-                        src={project.coverImage}
-                        alt={project.title}
-                        className="w-16 h-12 object-cover rounded"
-                      />
-                    </td>
-                    <td className="p-2 font-medium text-gray-800 border">
-                      {project.title}
-                    </td>
-                    <td className="p-2 text-gray-600 border">
-                      {project.projectType}
-                    </td>
-                    <td className="p-2 text-gray-600 border">{project.city}</td>
-                    <td className="p-2 border flex flex-col gap-2">
-                      <button
-                        className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
-                        onClick={() => {
-                          router.push(`/admin/edit-project/${project._id}`);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
-                        onClick={() => {
-                          setDeleteId(project._id);
-                          setShowDeleteModal(true);
-                        }}
-                        title="Delete"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                projects
+                  .filter((project) =>
+                    project.title.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((project) => (
+                    <tr key={project._id} className="border hover:bg-gray-50">
+                      <td className="p-2 border">
+                        <img
+                          src={project.coverImage}
+                          alt={project.title}
+                          className="w-16 h-12 object-cover rounded"
+                        />
+                      </td>
+                      <td className="p-2 font-medium text-gray-800 border">
+                        {project.title}
+                      </td>
+                      <td className="p-2 text-gray-600 border">
+                        {project.projectType}
+                      </td>
+                      <td className="p-2 text-gray-600 border">{project.city}</td>
+                      <td className="p-2 border flex flex-col gap-2">
+                        <button
+                          className="bg-blue-500 text-white px-2 py-1 rounded cursor-pointer"
+                          onClick={() => {
+                            router.push(`/admin/edit-project/${project._id}`);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
+                          onClick={() => {
+                            setDeleteId(project._id);
+                            setShowDeleteModal(true);
+                          }}
+                          title="Delete"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>

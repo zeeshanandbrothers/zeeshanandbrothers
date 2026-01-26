@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import Loader from "@/components/ui/Loader";
 
 export default function AdminLogin() {
   const [loading, setLoading] = useState(false);

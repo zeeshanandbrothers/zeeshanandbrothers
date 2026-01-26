@@ -56,13 +56,13 @@ export async function POST(request) {
         // 2. Upload Gallery Images
         let galleryImageUrls = [];
         if (galleryImageFiles && galleryImageFiles.length > 0) {
-             const validFiles = galleryImageFiles.filter(f => typeof f === 'object' && f.size > 0);
-             if (validFiles.length > 0) {
-                 const uploads = await Promise.all(
-                     validFiles.map(file => uploadToCloudinary(file, "projects/gallery"))
-                 );
-                 galleryImageUrls = uploads.map(upload => upload.secure_url);
-             }
+            const validFiles = galleryImageFiles.filter(f => typeof f === 'object' && f.size > 0);
+            if (validFiles.length > 0) {
+                const uploads = await Promise.all(
+                    validFiles.map(file => uploadToCloudinary(file, "projects/gallery"))
+                );
+                galleryImageUrls = uploads.map(upload => upload.secure_url);
+            }
         }
 
         const newProject = await Project.create({
@@ -91,7 +91,17 @@ export async function POST(request) {
 export async function GET(request) {
     try {
         await connectDB();
-        const projects = await Project.find().sort({ date: -1 });
+
+        const { searchParams } = new URL(request.url);
+        const projectType = searchParams.get("projectType");
+
+        let query = {};
+        // If projectType is provided and not "all", add it to the query
+        if (projectType && projectType !== "all") {
+            query.projectType = projectType;
+        }
+
+        const projects = await Project.find(query).sort({ date: -1 });
         return NextResponse.json(projects);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });

@@ -149,9 +149,8 @@ function EditProfileModal({ admin, close }) {
 
           <button
             disabled={loading}
-            className={`w-full py-2 text-white rounded cursor-pointer ${
-              loading ? "bg-gray-400" : "bg-blue-600"
-            }`}
+            className={`w-full py-2 text-white rounded cursor-pointer ${loading ? "bg-gray-400" : "bg-blue-600"
+              }`}
           >
             {loading ? "Updating..." : "Update"}
           </button>
