@@ -21,6 +21,7 @@ export async function POST(request) {
     const systemType = formData.get("systemType");
     const phase = formData.get("phase");
     const Ah = formData.get("Ah");
+    const modelNo = formData.get("modelNo");
 
     const imageFile = formData.get("image");
 
@@ -59,6 +60,7 @@ export async function POST(request) {
       productData.actualWatt = actualWatt;
       productData.systemType = systemType;
       productData.phase = phase;
+      productData.modelNo = modelNo;
     }
 
     if (category === "battery") {

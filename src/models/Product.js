@@ -49,6 +49,7 @@ const Inverter =
       actualWatt: Number,
       systemType: { type: String, enum: ["ongrid", "offgrid", "hybrid"] },
       phase: { type: String, enum: ["single", "three"] },
+      modelNo: String,
     })
   );
 

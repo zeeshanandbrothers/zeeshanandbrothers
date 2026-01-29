@@ -233,6 +233,17 @@ export default function AddProduct() {
                     <option value="three">Three</option>
                   </select>
                 </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Model No
+                  </label>
+                  <input
+                    name="modelNo"
+                    placeholder="Enter model number"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
               </div>
             )}
 
