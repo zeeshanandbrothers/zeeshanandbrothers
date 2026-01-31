@@ -88,6 +88,11 @@ const Header = () => {
                 Calculator
               </Link>
             </li>
+            <li>
+              <Link className="text-sm hover:underline" href="/projects">
+                Projects
+              </Link>
+            </li>
             {/* <li>
               <Link
                 className="block rounded-md px-2 py-2 text-sm hover:bg-secondary"
