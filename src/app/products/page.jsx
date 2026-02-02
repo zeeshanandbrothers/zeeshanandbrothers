@@ -43,7 +43,7 @@ const ProductsPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-background py-12 md:py-16">
+        <div className="min-h-screen bg-background py-12 pt-25">
             <div className="mx-auto max-w-7xl px-4">
                 {/* Page Header */}
                 <div className="mb-12 text-center">

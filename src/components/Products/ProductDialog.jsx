@@ -63,6 +63,43 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
 
 
     const isInStock = product.stock > 0;
+    // Add this function inside your ProductDialog component
+    const handleWhatsAppClick = () => {
+        if (!product) return;
+
+        const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+        if (!phoneNumber) {
+            console.error("WhatsApp number is not defined!");
+            return;
+        }
+
+        const messageLines = [
+            "Hello! I'm interested in this product:",
+            `Name: ${product.name}`,
+            `Brand: ${product.brand || "N/A"}`,
+            `Category: ${getCategoryDisplay(product.category)}`,
+            `Price: ${formatPrice(product.price)}`,
+            `Stock: ${product.stock} ${product.stock > 0 ? "available" : "not available"}`,
+            "Specifications:",
+            product.watt ? `Rated Power: ${product.watt}W` : null,
+            product.actualWatt ? `Actual Power: ${product.actualWatt}W` : null,
+            product.systemType ? `System Type: ${product.systemType}` : null,
+            product.phase ? `Phase: ${product.phase}` : null,
+            product.Ah ? `Battery Capacity: ${product.Ah}Ah` : null,
+            product.sku ? `SKU: ${product.sku}` : null
+        ].filter(Boolean);
+
+        // Join lines with newline \n
+        const message = messageLines.join("\n");
+
+        // URL encode the entire message
+        const encodedMessage = encodeURIComponent(message);
+
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+        window.open(whatsappUrl, "_blank");
+    };
+
 
     return (
         <AnimatePresence>
@@ -108,22 +145,6 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
                                             />
                                         </div>
 
-                                        {/* Category and Stock Badges */}
-                                        <div className="mt-4 flex flex-wrap gap-2">
-                                            <div className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                                                {getCategoryDisplay(product.category)}
-                                            </div>
-                                            {!isInStock && (
-                                                <div className="rounded-full bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400">
-                                                    Out of Stock
-                                                </div>
-                                            )}
-                                            {isInStock && (
-                                                <div className="rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-600 dark:text-green-400">
-                                                    {product.stock} in stock
-                                                </div>
-                                            )}
-                                        </div>
                                     </div>
 
                                     {/* Content Side (Right/Bottom) */}
@@ -144,6 +165,24 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
                                         {/* Price */}
                                         <div className="mb-6 text-3xl font-bold text-primary">
                                             {formatPrice(product.price)}
+                                        </div>
+
+
+                                        {/* Category and Stock Badges */}
+                                        <div className="mb-6 flex flex-wrap gap-2">
+                                            <div className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+                                                {getCategoryDisplay(product.category)}
+                                            </div>
+                                            {!isInStock && (
+                                                <div className="rounded-full bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400">
+                                                    Out of Stock
+                                                </div>
+                                            )}
+                                            {isInStock && (
+                                                <div className="rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-600 dark:text-green-400">
+                                                    {product.stock} in stock
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Description */}
@@ -218,9 +257,11 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
                                             <button
                                                 className="w-full rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 disabled={!isInStock}
+                                                onClick={handleWhatsAppClick}
                                             >
                                                 {isInStock ? "Contact for Order" : "Out of Stock"}
                                             </button>
+
                                         </div>
                                     </div>
                                 </div>

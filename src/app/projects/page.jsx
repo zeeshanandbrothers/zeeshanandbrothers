@@ -50,7 +50,7 @@ export default function ProjectsPage() {
     );
 
   return (
-    <main className="min-h-screen bg-background py-12 md:py-16">
+    <main className="min-h-screen bg-background py-12 pt-25">
       <div className="mx-auto max-w-7xl px-4">
         {/* Header */}
         <div className="mb-10 md:mb-12 text-center">

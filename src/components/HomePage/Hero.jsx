@@ -6,7 +6,7 @@ import RevealOnScroll from "../Layout/Reveal_on_scroll";
 const Hero = () => {
   const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
   return (
-    <section className="relative border-b" aria-label="Hero">
+    <section className="relative border-b h-screen" aria-label="Hero">
       {/* 🔹 Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
@@ -25,26 +25,22 @@ const Hero = () => {
       <div className="absolute inset-0 bg-background/50" />
 
       {/* 🔹 Content */}
-      <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24 text-white">
+      <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-25 sm:pt-40 text-white">
         <RevealOnScroll as="div" className="max-w-3xl">
-          <img
-            src="/images/logo.png"
-            alt="Zeeshan & Brothers"
-            className="mb-3 h-10 w-auto animate-fade-up rounded-sm"
-          />
-          <h1 className="text-black text-3xl font-semibold leading-tight md:text-5xl">
+
+          <h1 className="text-black text-5xl font-semibold sm:text-left leading-tight sm:text-6xl">
             Calculate Your Solar Needs Instantly
           </h1>
-          <p className="mt-3 max-w-2xl text-black text-base leading-relaxed md:text-lg">
+          <p className="mt-3 max-w-2xl text-black leading-relaxed text-lg md:text-xl">
             Modern, efficient and eco-friendly solar solutions tailored for your
             home and business.
           </p>
         </RevealOnScroll>
 
-        <div className="mt-6 flex items-center gap-3">
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
           <Link
             href="/load-calculator"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground animate-fade-up"
+            className="rounded-md bg-primary px-4 py-3 text-sm font-medium text-primary-foreground animate-fade-up"
           >
             Calculate Load
           </Link>
@@ -52,7 +48,7 @@ const Hero = () => {
             href={`https://wa.me/${WHATSAPP_NUMBER}?text=I%20want%20a%20solar%20quotation`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground animate-float-slow"
+            className="rounded-md bg-accent px-4 py-3 text-sm font-medium text-accent-foreground animate-float-slow"
             aria-label="Get Quotation on WhatsApp"
           >
             Get Quotation on WhatsApp

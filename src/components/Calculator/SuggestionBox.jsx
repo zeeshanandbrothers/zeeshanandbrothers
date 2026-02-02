@@ -7,7 +7,7 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
   const { totalWatts } = calc;
 
   const [selectedSystemType, setSelectedSystemType] = useState(
-    systemType || "hybrid"
+    systemType || "hybrid",
   );
 
   const [apiInverters, setApiInverters] = useState([]);
@@ -93,7 +93,7 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
   console.log("selectedPanel", selectedPanel);
   const selectedBattery = {};
   const selectedInverter = apiInverters.find(
-    (inv) => inv._id === selectedInverterId
+    (inv) => inv._id === selectedInverterId,
   );
 
   useEffect(() => {
@@ -143,33 +143,6 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
       </div>
     );
 
-  //   const whatsappMessage = `
-  // 🌞 *Solar System Quotation Request* 🌞
-
-  // *System Type:* ${selectedSystemType.toUpperCase()}
-  // *Total Load:* ${totalWatts.toLocaleString()} W
-  // *Inverter Required:* ${inverterKVA} kVA
-  // *Battery Capacity:* ${batteryAh} Ah
-
-  // 🔹 *Suggested Equipment:*
-  // • Panel: ${selectedPanel?.name} (${
-  //     selectedPanel?.watt
-  //   }W × ${requiredPanels} pcs)
-  // ${
-  //   selectedSystemType !== "onGrid"
-  //     ? `• Battery: ${selectedBattery?.name} (${selectedBattery?.ah}Ah)`
-  //     : ""
-  // }
-  // • Inverter: ${selectedInverter?.name} (${selectedInverter?.kva}kVA)
-
-  // 💰 *Estimated Total Cost:* PKR ${approxCostPKR.toLocaleString()}
-  // `.trim();
-
-  //   const WHATSAPP_NUMBER =
-  //     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923001234567";
-  //   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  //     whatsappMessage
-  //   )}`;
 
   if (loading) {
     return (
@@ -225,9 +198,8 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
             <img
               src={selectedPanel.image || "/images/solar-fallback.png"}
               alt={selectedPanel.name}
-              className={`w-20 object-cover rounded ${
-                isFallback ? "h-30 w-25" : "h-20"
-              }`}
+              className={`w-20 object-cover rounded ${isFallback ? "h-30 w-25" : "h-20"
+                }`}
               onError={(e) => {
                 setIsFallback(true);
                 e.currentTarget.src = "/images/solar-fallback.png";
@@ -255,7 +227,7 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
               </p>
             </div>
           </div>
-           
+
         </div>
       )}
 
@@ -335,9 +307,8 @@ const SuggestionBox = ({ calc, systemType, onBuyNow }) => {
                   <img
                     src={inv.image || "/images/inverter-fallback.png"}
                     alt={inv.name}
-                    className={`w-20 object-cover rounded ${
-                      isFallback ? "h-30 w-25" : "h-20"
-                    }`}
+                    className={`w-20 object-cover rounded ${isFallback ? "h-30 w-25" : "h-20"
+                      }`}
                     onError={(e) => {
                       setIsFallback(true);
                       e.currentTarget.src = "/images/inverter-fallback.png";

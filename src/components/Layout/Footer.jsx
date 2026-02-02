@@ -44,7 +44,7 @@ const Footer = () => {
 
           {/* Copyright Section */}
           <div className="flex flex-col items-center gap-3">
-            <p className="text-sm text-gray-500 dark:text-gray-500 font-medium tracking-wide">
+            <p className="text-sm text-gray-500 text-center dark:text-gray-500 font-medium tracking-wide">
               &copy; {new Date().getFullYear()} Zeeshan & Brothers. All rights reserved.
             </p>
             <div className="flex items-center gap-2">

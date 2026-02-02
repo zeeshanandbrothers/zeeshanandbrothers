@@ -120,14 +120,14 @@ const LoadCalculator = () => {
         return prev.map((r) =>
           r.id === id
             ? {
-                ...r,
-                [field]:
-                  field === "name"
-                    ? value
-                    : field === "optionId"
+              ...r,
+              [field]:
+                field === "name"
+                  ? value
+                  : field === "optionId"
                     ? value
                     : Math.max(0, Number(value) || 0),
-              }
+            }
             : r
         );
       } else {
@@ -159,12 +159,12 @@ const LoadCalculator = () => {
         prev.map((r) =>
           r.id === rowId
             ? {
-                ...r,
-                optionId: null,
-                name: capitalizeType(r.type),
-                watts: 0,
-                qty: 1,
-              }
+              ...r,
+              optionId: null,
+              name: capitalizeType(r.type),
+              watts: 0,
+              qty: 1,
+            }
             : r
         )
       );
@@ -176,11 +176,11 @@ const LoadCalculator = () => {
       prev.map((r) =>
         r.id === rowId
           ? {
-              ...r,
-              optionId: selected ? selected.id : null,
-              name: selected ? selected.label : r.name,
-              watts: selected ? selected.watts : r.watts,
-            }
+            ...r,
+            optionId: selected ? selected.id : null,
+            name: selected ? selected.label : r.name,
+            watts: selected ? selected.watts : r.watts,
+          }
           : r
       )
     );
@@ -189,7 +189,7 @@ const LoadCalculator = () => {
   const calc = useLoadCalculations(rows);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 md:py-14">
+    <main className="mx-auto max-w-6xl px-4 py-10 pt-25">
       <header className="mb-6">
         <h1 className="text-2xl font-semibold md:text-3xl">
           Electricity Load Calculator
