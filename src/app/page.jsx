@@ -1,5 +1,5 @@
 // src/app/page.jsx
-// milestone 2 completed
+// milestone 3 completed
 import HomePage from "../pages/HomePage";
 
 export default function Home() {

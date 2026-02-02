@@ -96,35 +96,37 @@ const Header = () => {
         </button>
       </nav>
 
-      {/* Mobile Menu */}
-      <div
-        className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ease-in-out ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-      >
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-md" onClick={() => setOpen(false)} />
-        <div className={`absolute top-24 left-4 right-4 bg-card border border-border/50 rounded-3xl p-6 shadow-2xl transition-all duration-500 transform ${open ? "translate-y-0 scale-100" : "-translate-y-10 scale-95"
-          }`}>
-          <ul className="space-y-4">
-            {navLinks.map((link, i) => (
-              <li
-                key={link.href}
-                className={`transition-all duration-500 delay-[${i * 100}ms] ${open ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                  }`}
+      {open && (
+        <div className="md:hidden border-t bg-background animate-fade-up">
+          <ul className="mx-auto max-w-6xl px-4 py-3 space-y-2">
+            <li>
+              <Link
+                className="block rounded-md px-2 py-2 text-sm hover:bg-secondary"
+                href="/load-calculator"
+                onClick={() => setOpen(false)}
               >
-                <Link
-                  className={`block px-4 py-3 rounded-xl text-base font-semibold transition-all duration-300 ${pathname === link.href
-                    ? "bg-primary/10 text-primary"
-                    : "hover:bg-secondary text-foreground"
-                    }`}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-            <li className={`pt-4 transition-all duration-500 delay-[200ms] ${open ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-              }`}>
+                Calculator
+              </Link>
+            </li>
+            {/* <li>
+              <Link
+                className="block rounded-md px-2 py-2 text-sm hover:bg-secondary"
+                href="/products"
+                onClick={() => setOpen(false)}
+              >
+                Products
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="block rounded-md px-2 py-2 text-sm hover:bg-secondary"
+                href="/reviews"
+                onClick={() => setOpen(false)}
+              >
+                Reviews
+              </Link>
+            </li> */}
+            <li>
               <Link
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=I%20want%20a%20solar%20quotation`}
                 target="_blank"
@@ -138,7 +140,7 @@ const Header = () => {
           </ul>
         </div>
       </div>
-    </header>
+    </header >
   );
 };
 export default Header;
