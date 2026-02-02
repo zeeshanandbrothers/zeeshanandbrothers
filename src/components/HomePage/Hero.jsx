@@ -6,7 +6,7 @@ import RevealOnScroll from "../Layout/Reveal_on_scroll";
 const Hero = () => {
   const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
   return (
-    <section className="relative border-b h-screen" aria-label="Hero">
+    <section className="relative border-b " aria-label="Hero">
       {/* 🔹 Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"
