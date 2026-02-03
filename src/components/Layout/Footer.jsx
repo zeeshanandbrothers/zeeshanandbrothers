@@ -25,13 +25,13 @@ const Footer = () => {
             <div className="relative p-1 rounded-xl bg-gradient-to-tr from-primary/20 to-transparent ring-1 ring-border shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:shadow-primary/5">
               <img
                 src="/images/logo.png"
-                alt="Zeeshan & Brothers logo"
+                alt="Zeeshan And Brothers logo"
                 className="h-16 w-auto rounded-lg object-contain"
               />
             </div>
             <div className="text-center space-y-1">
               <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100 uppercase">
-                Zeeshan <span className="text-primary">&</span> Brothers
+                Zeeshan And Brothers
               </h2>
               <p className="text-sm font-medium text-gray-500/80 dark:text-gray-400/80 uppercase tracking-[0.2em]">
                 Solar Energy Solutions
@@ -45,7 +45,7 @@ const Footer = () => {
           {/* Copyright Section */}
           <div className="flex flex-col items-center gap-3">
             <p className="text-sm text-gray-500 text-center dark:text-gray-500 font-medium tracking-wide">
-              &copy; {new Date().getFullYear()} Zeeshan & Brothers. All rights reserved.
+              &copy; {new Date().getFullYear()} Zeeshan And Brothers. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
               <div className="h-1 w-1 rounded-full bg-primary/50" />

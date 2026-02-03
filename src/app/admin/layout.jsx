@@ -131,7 +131,7 @@ export default function AdminLayout({ children }) {
                   className="h-8 w-auto rounded-sm"
                 />
                 <span className="text-sm font-semibold">
-                  Zeeshan & Brothers
+                  Zeeshan And Brothers
                 </span>
               </Link>
               <button

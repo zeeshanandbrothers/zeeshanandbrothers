@@ -52,7 +52,7 @@ const Header = () => {
             />
           </div>
           <span className="hidden min-[400px]:inline text-sm font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:to-primary transition-all duration-300">
-            Zeeshan &amp; Brothers
+            Zeeshan And Brothers
           </span>
         </Link>
 
