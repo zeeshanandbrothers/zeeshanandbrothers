@@ -104,10 +104,18 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
+    const search = searchParams.get("search");
 
     let query = {};
 
-    if (category) query.category = category;
+    if (category && category !== "all") query.category = category;
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const products = await Product.find(query);
     return NextResponse.json(products);

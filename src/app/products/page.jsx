@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProductCard from "@/components/Products/ProductCard";
 import ProductDialog from "@/components/Products/ProductDialog";
+import SearchBar from "@/components/ui/SearchBar";
 import { Filter } from "lucide-react";
 
 const ProductsPage = () => {
@@ -11,15 +12,17 @@ const ProductsPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const url =
-                    selectedCategory === "all"
-                        ? "/api/products"
-                        : `/api/products?category=${selectedCategory}`;
+                const params = new URLSearchParams();
+                if (selectedCategory !== "all") params.append("category", selectedCategory);
+                if (searchQuery) params.append("search", searchQuery);
+                
+                const url = `/api/products?${params.toString()}`;
                 const res = await fetch(url);
                 const data = await res.json();
                 if (Array.isArray(data)) {
@@ -32,7 +35,7 @@ const ProductsPage = () => {
             }
         };
         fetchProducts();
-    }, [selectedCategory]);
+    }, [selectedCategory, searchQuery]);
 
     const categories = [
         { id: "all", label: "All Products" },
@@ -61,6 +64,8 @@ const ProductsPage = () => {
                         Quality components for your solar installation needs.
                     </motion.p>
                 </div>
+
+                <SearchBar onSearch={setSearchQuery} />
 
                 {/* Category Filter */}
                 <motion.div initial={{ opacity: 0, y: 20 }}
