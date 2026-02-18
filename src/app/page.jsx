@@ -1,0 +1,11 @@
+// src/app/page.jsx
+// tiny changes for code push
+import HomePage from "../pages/HomePage";
+
+export default function Home() {
+  return (
+    <div>
+      <HomePage />
+    </div>
+  );
+}
