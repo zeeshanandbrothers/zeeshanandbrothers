@@ -19,7 +19,6 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Hide header on admin routes
   if (pathname.startsWith("/admin")) {
     return null;
   }

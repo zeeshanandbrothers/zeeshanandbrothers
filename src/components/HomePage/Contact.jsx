@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import RevealOnScroll from "../Layout/Reveal_on_scroll";
 
 const Contact = () => {
