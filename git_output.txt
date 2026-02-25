@@ -1,0 +1,31 @@
+Starting Git Merge... 
+From github-friend:zeeshanandbrothers/zeeshanandbrothers
+ * branch            main       -> FETCH_HEAD
+Auto-merging src/app/globals.css
+CONFLICT (add/add): Merge conflict in src/app/globals.css
+Auto-merging src/app/layout.jsx
+CONFLICT (add/add): Merge conflict in src/app/layout.jsx
+Auto-merging src/app/page.jsx
+CONFLICT (add/add): Merge conflict in src/app/page.jsx
+Auto-merging src/app/products/page.jsx
+CONFLICT (add/add): Merge conflict in src/app/products/page.jsx
+Auto-merging src/app/projects/page.jsx
+CONFLICT (add/add): Merge conflict in src/app/projects/page.jsx
+Auto-merging src/components/HomePage/Hero.jsx
+CONFLICT (add/add): Merge conflict in src/components/HomePage/Hero.jsx
+Auto-merging src/components/HomePage/InstalledProjects.jsx
+CONFLICT (add/add): Merge conflict in src/components/HomePage/InstalledProjects.jsx
+Auto-merging src/components/HomePage/ProductsPreview.jsx
+CONFLICT (add/add): Merge conflict in src/components/HomePage/ProductsPreview.jsx
+Auto-merging src/components/Layout/Footer.jsx
+CONFLICT (add/add): Merge conflict in src/components/Layout/Footer.jsx
+Auto-merging src/components/Layout/Header.jsx
+CONFLICT (add/add): Merge conflict in src/components/Layout/Header.jsx
+Auto-merging src/components/Products/ProductCard.jsx
+CONFLICT (add/add): Merge conflict in src/components/Products/ProductCard.jsx
+Auto-merging src/components/Products/ProductDialog.jsx
+CONFLICT (add/add): Merge conflict in src/components/Products/ProductDialog.jsx
+Auto-merging src/components/Projects/ProjectCard.jsx
+CONFLICT (add/add): Merge conflict in src/components/Projects/ProjectCard.jsx
+Automatic merge failed; fix conflicts and then commit the result.
+Git Merge Finished. 
