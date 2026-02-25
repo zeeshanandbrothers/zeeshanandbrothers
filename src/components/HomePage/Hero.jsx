@@ -55,13 +55,6 @@ const Hero = () => {
           </Link>
         </div>
 
-        <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs animate-fade-up">
-          <span
-            className="inline-block h-2 w-2 rounded-full bg-primary animate-float-slow"
-            aria-hidden="true"
-          />
-          Limited-time free site assessment
-        </div>
       </div>
     </section>
   );

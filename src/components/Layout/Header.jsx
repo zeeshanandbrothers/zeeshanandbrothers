@@ -44,16 +44,16 @@ const Header = () => {
           }`}
       >
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative overflow-hidden rounded-full p-1 bg-gradient-to-tr from-primary to-accent transition-transform duration-500 group-hover:rotate-12">
-            <img
-              src="/images/logo.png"
-              alt="Zeeshan & Brothers logo"
-              className="h-8 w-8 object-contain rounded-full bg-background"
-            />
-          </div>
-          <span className="hidden min-[400px]:inline text-sm font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:to-primary transition-all duration-300">
+          {/* <div className="relative overflow-hidden rounded-xl p-1 bg-gradient-to-tr from-primary to-accent transition-transform duration-500 group-hover:scale-105"> */}
+          <img
+            src="/images/logo.png"
+            alt="Zeeshan & Brothers logo"
+            className="h-16 w-auto object-contain bg-background px-1 py-1 rounded-lg"
+          />
+          {/* </div> */}
+          {/* <span className="hidden min-[400px]:inline text-sm font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:to-primary transition-all duration-300">
             Zeeshan And Brothers
-          </span>
+          </span> */}
         </Link>
 
         {/* Desktop Navigation */}

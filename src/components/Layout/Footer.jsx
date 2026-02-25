@@ -34,7 +34,7 @@ const Footer = () => {
                 Zeeshan And Brothers
               </h2>
               <p className="text-sm font-medium text-gray-500/80 dark:text-gray-400/80 uppercase tracking-[0.2em]">
-                Solar Energy Solutions
+                Electric Power Solutions
               </p>
             </div>
           </div>

@@ -79,7 +79,7 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
             `Brand: ${product.brand || "N/A"}`,
             `Category: ${getCategoryDisplay(product.category)}`,
             `Price: ${formatPrice(product.price)}`,
-            `Stock: ${product.stock} ${product.stock > 0 ? "available" : "not available"}`,
+            `Stock: ${product.stock > 0 ? "In Stock" : "Out of Stock"}`,
             "Specifications:",
             product.watt ? `Rated Power: ${product.watt}W` : null,
             product.actualWatt ? `Actual Power: ${product.actualWatt}W` : null,
@@ -180,7 +180,7 @@ const ProductDialog = ({ product, isOpen, onClose }) => {
                                             )}
                                             {isInStock && (
                                                 <div className="rounded-full bg-green-500/10 px-4 py-2 text-sm font-semibold text-green-600 dark:text-green-400">
-                                                    {product.stock} in stock
+                                                    In Stock
                                                 </div>
                                             )}
                                         </div>

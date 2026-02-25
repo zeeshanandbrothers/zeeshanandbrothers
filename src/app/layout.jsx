@@ -55,16 +55,22 @@ const inter = localFont({
   variable: "--font-inter",
   display: "swap",
 });
+import { LoadingProvider } from "../context/LoadingContext";
+import GlobalLoader from "../components/Layout/GlobalLoader";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={inter.variable}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster />
-        <Header />
-        {children}
-        <Footer />
+        <LoadingProvider>
+          <Toaster />
+          <GlobalLoader />
+          <Header />
+          {children}
+          <Footer />
+        </LoadingProvider>
       </body>
     </html>
   );

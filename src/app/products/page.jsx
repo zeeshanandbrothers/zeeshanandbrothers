@@ -6,6 +6,7 @@ import ProductCard from "@/components/Products/ProductCard";
 import ProductDialog from "@/components/Products/ProductDialog";
 import SearchBar from "@/components/ui/SearchBar";
 import { Filter } from "lucide-react";
+import { useLoading } from "@/context/LoadingContext";
 
 const ProductsPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -13,6 +14,7 @@ const ProductsPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
+    const { setIsProductsLoaded } = useLoading();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -21,7 +23,7 @@ const ProductsPage = () => {
                 const params = new URLSearchParams();
                 if (selectedCategory !== "all") params.append("category", selectedCategory);
                 if (searchQuery) params.append("search", searchQuery);
-                
+
                 const url = `/api/products?${params.toString()}`;
                 const res = await fetch(url);
                 const data = await res.json();
@@ -32,6 +34,7 @@ const ProductsPage = () => {
                 console.error("Failed to load products", error);
             } finally {
                 setLoading(false);
+                setIsProductsLoaded(true);
             }
         };
         fetchProducts();

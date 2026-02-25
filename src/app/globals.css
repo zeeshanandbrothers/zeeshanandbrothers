@@ -199,3 +199,74 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ---------------------------------------------
+   Premium UI Utilities
+---------------------------------------------- */
+.glass {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.glass-dark {
+  @apply bg-black/20 backdrop-blur-md border border-white/10;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glow-primary {
+  box-shadow: 0 0 20px oklch(0.38 0.08 250 / 0.3);
+}
+
+.glow-accent {
+  box-shadow: 0 0 20px oklch(0.88 0.16 95 / 0.3);
+}
+
+.bg-mesh {
+  background-image:
+    radial-gradient(at 0% 0%, oklch(0.38 0.08 250 / 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, oklch(0.88 0.16 95 / 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, oklch(0.38 0.08 250 / 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, oklch(0.88 0.16 95 / 0.05) 0px, transparent 50%);
+}
+
+.text-gradient-primary {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/80 to-secondary;
+}
+
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl;
+}
+
+/* Background Patterns */
+.bg-dots {
+  background-image: radial-gradient(oklch(0.9 0 0) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, oklch(0.9 0 0) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.9 0 0) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-dot-primary {
+  background-image: radial-gradient(oklch(0.38 0.08 250 / 0.2) 2px, transparent 2px);
+  background-size: 32px 32px;
+}
+
+.bg-grid-primary {
+  background-image:
+    linear-gradient(to right, oklch(0.38 0.08 250 / 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.38 0.08 250 / 0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Mask Utilities */
+.mask-radial {
+  mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+}
+
+.mask-linear-v {
+  mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+}

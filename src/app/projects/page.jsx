@@ -5,12 +5,14 @@ import { motion } from "framer-motion";
 import ProjectCard from "../../components/Projects/ProjectCard";
 import ProjectDialog from "../../components/Projects/ProjectDialog";
 import { Filter } from "lucide-react";
+import { useLoading } from "../../context/LoadingContext";
 
 export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProjectType, setSelectedProjectType] = useState("all")
+  const { setIsProjectsLoaded } = useLoading();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -29,6 +31,7 @@ export default function ProjectsPage() {
         console.error("Failed to load projects", error);
       } finally {
         setLoading(false);
+        setIsProjectsLoaded(true);
       }
     };
     fetchProjects();
