@@ -1,4 +1,3 @@
-/* new animated navbar in JSX */
 "use client";
 
 import { Menu, X } from "lucide-react";

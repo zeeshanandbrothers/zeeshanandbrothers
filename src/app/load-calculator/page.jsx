@@ -1,4 +1,4 @@
-import LoadCalculator from "@/pages/LoadCalculator";
+import LoadCalculator from "@/components/PagesContent/LoadCalculator";
 import React from "react";
 
 const LoadCalculatorPage = () => {

@@ -4,6 +4,9 @@ import "./globals.css";
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import { Toaster } from "react-hot-toast";
+import { LoadingProvider } from "../context/LoadingContext";
+import GlobalLoader from "../components/Layout/GlobalLoader";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,8 +58,7 @@ const inter = localFont({
   variable: "--font-inter",
   display: "swap",
 });
-import { LoadingProvider } from "../context/LoadingContext";
-import GlobalLoader from "../components/Layout/GlobalLoader";
+
 
 export default function RootLayout({ children }) {
   return (
@@ -64,13 +66,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LoadingProvider>
+        <Providers>
           <Toaster />
           <GlobalLoader />
           <Header />
           {children}
           <Footer />
-        </LoadingProvider>
+        </Providers>
       </body>
     </html>
   );
